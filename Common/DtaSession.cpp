@@ -190,7 +190,7 @@ DtaSession::authenticate(vector<uint8_t> Authority, char * Challenge)
 	cmd->addToken(OPAL_TOKEN::ENDLIST); // ]  (Close Bracket)
 	cmd->complete();
 	if ((lastRC = sendCommand(cmd, response)) != 0) {
-		LOG(E) << "Session Authenticate failed";
+		LOG(D) << "Session Authenticate failed";
 		delete cmd;
 		return lastRC;
 	}
@@ -241,7 +241,7 @@ DtaSession::sendCommand(DtaCommand * cmd, DtaResponse & response)
 		return DTAERROR_NO_METHOD_STATUS;
     }
     if (OPALSTATUSCODE::SUCCESS != response.getUint8(response.getTokenCount() - 4)) {
-        LOG(E) << "method status code " <<
+        LOG(D) << "method status code " <<
                 methodStatus(response.getUint8(response.getTokenCount() - 4));
     }
     return response.getUint8(response.getTokenCount() - 4);
