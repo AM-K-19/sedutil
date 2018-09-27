@@ -663,7 +663,7 @@ uint8_t DtaDevEnterprise::listLockingRanges(char * password, int16_t rangeid)
 		if ((curRC = session->start(OPAL_UID::ENTERPRISE_LOCKINGSP_UID, pwd, user)) != 0)
         {
 			if ((output_format == sedutilNormal) || (rangeid != -1)) {
-				LOG(I) << "    could not establish session for row[" << i << "]";
+				LOG(D) << "    could not establish session for row[" << i << "]";
 			}
 			failRC = curRC;
 			delete session;
