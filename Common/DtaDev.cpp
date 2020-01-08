@@ -258,7 +258,7 @@ void DtaDev::puke()
 	}
 	if (disk_info.Enterprise) {
 		cout << "Enterprise function (" << HEXON(4) << FC_ENTERPRISE << HEXOFF << ")" << std::endl;
-		cout << "    Range crossing = " << (disk_info.Enterprise_rangeCrossing ? "Y, " : "N, ")
+		cout << "    Range crossing = " << (disk_info.Enterprise_rangeCrossing ? "N, " : "Y, ")
 			<< "Base comID = " << HEXON(4) << disk_info.Enterprise_basecomID
 			<< ", comIDs = " << disk_info.Enterprise_numcomID << HEXOFF
 			<< std::endl;
@@ -294,7 +294,7 @@ void DtaDev::puke()
 		cout << std::endl;
 		cout << "    Locking Admins = " << disk_info.OPAL20_numAdmins;
 		cout << ", Locking Users = " << disk_info.OPAL20_numUsers;
-		cout << ", Range Crossing = " << (disk_info.OPAL20_rangeCrossing ? "Y" : "N");
+		cout << ", Range Crossing = " << (disk_info.OPAL20_rangeCrossing ? "N" : "Y");
 		cout << std::endl;
 	}
 	if (disk_info.Unknown)
