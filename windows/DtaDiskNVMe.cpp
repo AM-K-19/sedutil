@@ -25,7 +25,8 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #pragma warning(disable : 4091)
 #include <Ntddscsi.h>
 #pragma warning(pop)
-#include <winioctl.h>
+//#include <winioctl.h>
+#include <ntddstor.h>
 #include <vector>
 #include "DtaDiskNVMe.h"
 #include "DtaEndianFixup.h"
@@ -34,14 +35,16 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+constexpr ULONG NVME_MAX_LOG_SIZE{4096};  // value from random internet search
+
 // Missing stuff pulled from MSDN
-//
+// The missing stuff is defined in ntddstor.h (and in winioctl.h).
+// Uncertain if earlier versions of Visual Studio, etc., have these already defined.
+#if (_MSC_VER <= 1900)
 
 // STORAGE PROPERTY ID is defined but these #define values are missing
 #define StorageAdapterProtocolSpecificProperty (STORAGE_PROPERTY_ID) 49
 
-#define NVME_MAX_LOG_SIZE 4096  // value from random internet search
-#if 0
 typedef enum _STORAGE_PROTOCOL_TYPE {
     ProtocolTypeUnknown = 0x00,
     ProtocolTypeScsi,
@@ -73,6 +76,7 @@ typedef struct _STORAGE_PROTOCOL_DATA_DESCRIPTOR {
     DWORD                          Size;
     STORAGE_PROTOCOL_SPECIFIC_DATA ProtocolSpecificData;
 } STORAGE_PROTOCOL_DATA_DESCRIPTOR, *PSTORAGE_PROTOCOL_DATA_DESCRIPTOR;
+
 #endif
 // End of missing stuff
 
