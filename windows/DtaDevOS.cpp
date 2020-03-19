@@ -39,9 +39,9 @@ using namespace std;
 DtaDevOS::DtaDevOS() {};
 void DtaDevOS::init(const char * devref)
 {
-    LOG(D1) << "Creating DtaDevOS::DtaDevOS() " << devref;
-    dev = devref;
-    memset(&disk_info, 0, sizeof (OPAL_DiskInfo));
+	LOG(D1) << "Creating DtaDevOS::DtaDevOS() " << devref;
+	dev = devref;
+	memset(&disk_info, 0, sizeof (OPAL_DiskInfo));
 	/*  Open the drive to see if we have access */
 	ATA_PASS_THROUGH_DIRECT * ata =
 		(ATA_PASS_THROUGH_DIRECT *)_aligned_malloc(sizeof(ATA_PASS_THROUGH_DIRECT), 8);
@@ -101,21 +101,21 @@ void DtaDevOS::init(const char * devref)
 	}
 
 	disk->init(dev);
-    identify(disk_info);
+	identify(disk_info);
 	if (DEVICE_TYPE_OTHER != disk_info.devType) discovery0();
 }
 
 uint8_t DtaDevOS::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16_t comID,
-                        void * buffer, uint32_t bufferlen)
+						void * buffer, uint32_t bufferlen)
 {
-    LOG(D1) << "Entering DtaDevOS::sendCmd";
+	LOG(D1) << "Entering DtaDevOS::sendCmd";
 	LOG(D1) << "Exiting DtaDevOS::sendCmd";
 	return (disk->sendCmd(cmd, protocol, comID, buffer, bufferlen));
 }
 
 void DtaDevOS::osmsSleep(uint32_t milliseconds)
 {
-    Sleep(milliseconds);
+	Sleep(milliseconds);
 }
 unsigned long long DtaDevOS::getSize() {
 	if (DeviceIoControl(
@@ -135,48 +135,46 @@ unsigned long long DtaDevOS::getSize() {
 
 void DtaDevOS::identify(OPAL_DiskInfo& di)
 {
-    LOG(D1) << "Entering DtaDevOS::identify()";
+	LOG(D1) << "Entering DtaDevOS::identify()";
 	LOG(D1) << "Exiting DtaDevOS::identify()";
 	return(disk->identify(di));
 }
 /** Static member to scann for supported drives */
 int DtaDevOS::diskScan()
 {
-	char devname[25];
-	int i = 0;
-	DtaDev * d;
+	int i{0};
 	LOG(D1) << "Creating diskList";
-	printf("\nScanning for Opal compliant disks\n");
+	std::cout << "Scanning for Opal compliant disks" << std::endl;
 	while (TRUE) {
-		sprintf_s(devname, 23, "\\\\.\\PhysicalDrive%i", i);
-		d = new DtaDevGeneric(devname);
+		std::string devname(R"(\\.\PhysicalDrive)" + std::to_string(i));
+		auto d = std::make_unique<DtaDevGeneric>(devname);
 		if (d->isPresent()) {
-			printf("%s", devname);
-			if (d->isAnySSC())
-				printf(" %s%s%s ", (d->isOpal1() ? "1" : " "),
-				(d->isOpal2() ? "2" : " "), (d->isEprise() ? "E" : " "));
-			else
-				printf("%s", " No  ");
-			cout << d->getModelNum() << " " << d->getFirmwareRev() << std::endl;
+			std::cout << devname << " ";
+			if (d->isAnySSC()) {
+				std::cout << (d->isOpal1() ? "1" : " ")
+					<< (d->isOpal2() ? "2" : " ")
+					<< (d->isEprise() ? "E" : " ");
+			} else {
+				std::cout << "No  ";
+			}
+			std::cout << d->getModelNum() << " " << d->getFirmwareRev() << std::endl;
 			if (MAX_DISKS == i) {
 				LOG(I) << MAX_DISKS << " disks, really?";
-				delete d;
 				return 1;
 			}
 		}
-		else break;
-		delete d;
-		i += 1;
+		else
+			break;
+		++i;
 	}
-	delete d;
-	printf("No more disks present ending scan\n");
+	std::cout << "No more disks present ending scan" << std::endl;
 	return 0;
 }
 /** Close the filehandle so this object can be delete. */
 
 DtaDevOS::~DtaDevOS()
 {
-    LOG(D1) << "Destroying DtaDevOS";
+	LOG(D1) << "Destroying DtaDevOS";
 	delete disk;
 	CloseHandle(hDev);
 }
