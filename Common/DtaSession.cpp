@@ -129,12 +129,14 @@ DtaSession::start(OPAL_UID SP, char * HostChallenge, vector<uint8_t> SignAuthori
 	}
  
 	// w/o the timeout the session may wedge and require a power-cycle,
-	// e.g., when interrupted by ^C. 60 seconds is inconveniently long,
+	// e.g., when interrupted by ^C. 120 seconds is inconveniently long,
 	// but revert may require that long to complete.
+	// TODO - check that this value in greater than the minimum supported
+	// timeout
 	if (d->isEprise()) {
 		cmd->addToken(OPAL_TOKEN::STARTNAME);
 		cmd->addToken("SessionTimeout");
-		cmd->addToken(60000);
+		cmd->addToken(120000);
 		cmd->addToken(OPAL_TOKEN::ENDNAME);
 	}
 
@@ -188,7 +190,7 @@ DtaSession::authenticate(vector<uint8_t> Authority, char * Challenge)
 	cmd->addToken(OPAL_TOKEN::ENDLIST); // ]  (Close Bracket)
 	cmd->complete();
 	if ((lastRC = sendCommand(cmd, response)) != 0) {
-		LOG(E) << "Session Authenticate failed";
+		LOG(D) << "Session Authenticate failed";
 		delete cmd;
 		return lastRC;
 	}
@@ -239,7 +241,7 @@ DtaSession::sendCommand(DtaCommand * cmd, DtaResponse & response)
 		return DTAERROR_NO_METHOD_STATUS;
     }
     if (OPALSTATUSCODE::SUCCESS != response.getUint8(response.getTokenCount() - 4)) {
-        LOG(E) << "method status code " <<
+        LOG(D) << "method status code " <<
                 methodStatus(response.getUint8(response.getTokenCount() - 4));
     }
     return response.getUint8(response.getTokenCount() - 4);
