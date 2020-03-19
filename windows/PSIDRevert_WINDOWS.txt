@@ -47,7 +47,7 @@ DataStore function (0x0202)
     Max Tables = 9, Max Size Tables = 94371840, Table size alignment = 1
 OPAL 2.0 function (0x0203)
     Base comID = 0x1000, Initial PIN = 0x0 , Reverted PIN = 0x0 , comIDs = 1
-    Locking Admins = 4, Locking Users = 9, Range Crossing = N
+    Locking Admins = 4, Locking Users = 9, Range Crossing = Y
 
 U:\sedutil-cli\Release>sedutil-cli --yesIreallywanttoERASEALLmydatausingthePSID PSIDALLCAPSNODASHES \\.\PhysicalDrive3
 - 01:59:13.000 INFO: Performing a PSID Revert on \\.\PhysicalDrive3 with password PSIDALLCAPSNODASHES
