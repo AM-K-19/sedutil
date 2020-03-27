@@ -51,5 +51,6 @@ public:
 	void identify(OPAL_DiskInfo& disk_info) override;
 
 private:
+    void * scsiPointer;
     int StorIoctlCommon(HANDLE h, SRB_IO_CONTROL* buf, DWORD len);
 };
