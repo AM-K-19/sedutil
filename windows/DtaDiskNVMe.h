@@ -25,8 +25,6 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 class DtaDiskNVMe : public DtaDiskType
 {
 public:
-	~DtaDiskNVMe() override;
-
 	/** device specific initialization.
 	* This function should perform the necessary authority and environment checking
 	* to allow proper functioning of the program, open the device, perform an
@@ -51,5 +49,5 @@ public:
 	void identify(OPAL_DiskInfo& disk_info) override;
 
 private:
-    int StorIoctlCommon(HANDLE h, SRB_IO_CONTROL* buf, DWORD len);
+    void * scsiPointer;
 };
