@@ -43,8 +43,6 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include "DtaHexDump.h"
 #include "DtaDiskUSB.h"
 
-
-
 // Missing stuff pulled from MSDN
 // The missing stuff is defined in ntddstor.h (and in winioctl.h).
 // Uncertain if earlier versions of Visual Studio, etc., have these already defined.
@@ -55,12 +53,10 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 #define NVME_MAX_LOG_SIZE 4096  // value from random internet search
 
+#endif
 
 // End of missing stuff
 
-
-
-DtaDiskNVMe::DtaDiskNVMe() {};
 void DtaDiskNVMe::init(const char * devref)
 {
     LOG(D1) << "Creating DtaDiskNVMe::DtaDiskNVMe() " << devref;
