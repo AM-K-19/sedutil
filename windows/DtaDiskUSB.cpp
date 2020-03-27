@@ -32,11 +32,13 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include "DtaStructures.h"
 #include "DtaHexDump.h"
 
-using namespace std;
 
-DtaDiskUSB::DtaDiskUSB() {
-    isSAS = 0;
-};
+/** Close the filehandle so this object can be delete. */
+DtaDiskUSB::~DtaDiskUSB()
+{
+    LOG(D1) << "Destroying DtaDiskUSB";
+    _aligned_free(scsiPointer);
+}
 
 void DtaDiskUSB::init(const char * devref)
 {
@@ -135,15 +137,17 @@ uint8_t DtaDiskUSB::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16_t comID,
 void DtaDiskUSB::identify(OPAL_DiskInfo& disk_info)
 {
     identify_SAS(disk_info);
-    if (DEVICE_TYPE_OTHER!=disk_info.devType) {
+    if (DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER!=disk_info.devType) {
         return;
     }
 
     LOG(D1) << "Entering DtaDiskUSB::identify()";
-    vector<uint8_t> nullz(512, 0x00);
-    void * identifyResp = NULL;
+    std::vector<uint8_t> nullz(512, 0x00);
+    void* identifyResp{nullptr};
     identifyResp = _aligned_malloc(MIN_BUFFER_LENGTH, IO_BUFFER_ALIGNMENT);
-    if (NULL == identifyResp) return;
+    if (nullptr == identifyResp) {
+        return;
+    }
     memset(identifyResp, 0, MIN_BUFFER_LENGTH);
     uint8_t iorc = sendCmd(IDENTIFY, 0x00, 0x0000, identifyResp, MIN_BUFFER_LENGTH);
 
@@ -151,12 +155,12 @@ void DtaDiskUSB::identify(OPAL_DiskInfo& disk_info)
         LOG(D) << "IDENTIFY Failed " << (uint16_t) iorc;
     }
     if (!(memcmp(identifyResp, nullz.data(), 512))) {
-        disk_info.devType = DEVICE_TYPE_OTHER;
+        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
         _aligned_free(identifyResp);
         return;
     }
     USB_INQUIRY_DATA * id = (USB_INQUIRY_DATA *) identifyResp;
-    disk_info.devType = DEVICE_TYPE_USB;
+    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_USB;
     for (int i = 0; i < sizeof (disk_info.serialNum); i += 2) {
         disk_info.serialNum[i] = id->ProductSerial[i + 1];
         disk_info.serialNum[i + 1] = id->ProductSerial[i];
@@ -273,20 +277,29 @@ uint8_t DtaDiskUSB::sendCmd_SAS(ATACOMMAND cmd, uint8_t protocol, uint16_t comID
      return (scsi->sd.ScsiStatus);
 }
 
-static void safecopy(uint8_t * dst, size_t dstsize, uint8_t * src, size_t srcsize)
+static void safecopy(uint8_t* dst, size_t dstsize, uint8_t* src, size_t srcsize)
 {
     const size_t size = min(dstsize, srcsize);
-    if (size > 0) memcpy(dst, src, size);
-    if (size < dstsize) memset(dst+size, '\0', dstsize-size);
+    if (size > 0)
+    {
+        memcpy(dst, src, size);
+    }
+    if (size < dstsize)
+    {
+        memset(dst + size, '\0', dstsize - size);
+    }
 }
 
 void DtaDiskUSB::identify_SAS(OPAL_DiskInfo& disk_info)
 {
     LOG(D1) << "Entering DtaDiskUSB::identify_SAS()";
-    vector<uint8_t> nullz(512, 0x00);
-    void * identifyResp = NULL;
+    std::vector<uint8_t> nullz(512, 0x00);
+    void* identifyResp{nullptr};
     identifyResp = _aligned_malloc(MIN_BUFFER_LENGTH, IO_BUFFER_ALIGNMENT);
-    if (NULL == identifyResp) return;
+    if (nullptr == identifyResp)
+    {
+        return;
+    }
     memset(identifyResp, 0, MIN_BUFFER_LENGTH);
     uint8_t iorc = sendCmd_SAS(IDENTIFY, 0x00, 0x0000, identifyResp, MIN_BUFFER_LENGTH);
 
@@ -294,12 +307,12 @@ void DtaDiskUSB::identify_SAS(OPAL_DiskInfo& disk_info)
         LOG(D) << "IDENTIFY Failed " << (uint16_t) iorc;
     }
     if (!(memcmp(identifyResp, nullz.data(), 512))) {
-        disk_info.devType = DEVICE_TYPE_OTHER;
+        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
         _aligned_free(identifyResp);
         return;
     }
 
-    disk_info.devType = DEVICE_TYPE_USB;
+    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_USB;
     isSAS = 1;
 
     // response is a standard INQUIRY (at least 36 bytes)
@@ -317,13 +330,4 @@ void DtaDiskUSB::identify_SAS(OPAL_DiskInfo& disk_info)
 
     _aligned_free(identifyResp);
     return;
-}
-
-
-/** Close the filehandle so this object can be delete. */
-DtaDiskUSB::~DtaDiskUSB()
-{
-    LOG(D1) << "Destroying DtaDiskUSB";
-    CloseHandle(hDev);
-    _aligned_free(scsiPointer);
 }

@@ -18,14 +18,23 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 * C:E********************************************************************** */
 #pragma once
+
+#ifdef _MSC_VER
+// Make sure Windows macros don't overwrite standard functions
+#define NOMINMAX
+#endif
+
 #include "os.h"
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
+#include <array>
 #pragma warning(push)
 #pragma warning(disable : 4091)
 #include <Ntddscsi.h>
 #pragma warning(pop)
-//#include <winioctl.h>
+#include <winioctl.h>
+#include <nvme.h>
 #include <ntddstor.h>
 #include <vector>
 #include "DtaDiskNVMe.h"
@@ -33,9 +42,9 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include "DtaStructures.h"
 #include "DtaHexDump.h"
 
-using namespace std;
-
+#ifndef NVME_MAX_LOG_SIZE
 constexpr ULONG NVME_MAX_LOG_SIZE{4096};  // value from random internet search
+#endif
 
 // Missing stuff pulled from MSDN
 // The missing stuff is defined in ntddstor.h (and in winioctl.h).
@@ -45,7 +54,8 @@ constexpr ULONG NVME_MAX_LOG_SIZE{4096};  // value from random internet search
 // STORAGE PROPERTY ID is defined but these #define values are missing
 #define StorageAdapterProtocolSpecificProperty (STORAGE_PROPERTY_ID) 49
 
-typedef enum _STORAGE_PROTOCOL_TYPE {
+typedef enum _STORAGE_PROTOCOL_TYPE
+{
     ProtocolTypeUnknown = 0x00,
     ProtocolTypeScsi,
     ProtocolTypeAta,
@@ -54,7 +64,9 @@ typedef enum _STORAGE_PROTOCOL_TYPE {
     ProtocolTypeProprietary = 0x7E,
     ProtocolTypeMaxReserved = 0x7F
 } STORAGE_PROTOCOL_TYPE, *PSTORAGE_PROTOCOL_TYPE;
-typedef struct _STORAGE_PROTOCOL_SPECIFIC_DATA {
+
+typedef struct _STORAGE_PROTOCOL_SPECIFIC_DATA
+{
     STORAGE_PROTOCOL_TYPE ProtocolType;
     DWORD                 DataType;
     DWORD                 ProtocolDataRequestValue;
@@ -65,13 +77,16 @@ typedef struct _STORAGE_PROTOCOL_SPECIFIC_DATA {
     DWORD                 Reserved[3];
 } STORAGE_PROTOCOL_SPECIFIC_DATA, *PSTORAGE_PROTOCOL_SPECIFIC_DATA;
 
-typedef enum _STORAGE_PROTOCOL_NVME_DATA_TYPE {
+typedef enum _STORAGE_PROTOCOL_NVME_DATA_TYPE
+{
     NVMeDataTypeUnknown = 0,
     NVMeDataTypeIdentify,
     NVMeDataTypeLogPage,
     NVMeDataTypeFeature
 } STORAGE_PROTOCOL_NVME_DATA_TYPE, *PSTORAGE_PROTOCOL_NVME_DATA_TYPE;
-typedef struct _STORAGE_PROTOCOL_DATA_DESCRIPTOR {
+
+typedef struct _STORAGE_PROTOCOL_DATA_DESCRIPTOR
+{
     DWORD                          Version;
     DWORD                          Size;
     STORAGE_PROTOCOL_SPECIFIC_DATA ProtocolSpecificData;
@@ -80,10 +95,13 @@ typedef struct _STORAGE_PROTOCOL_DATA_DESCRIPTOR {
 #endif
 // End of missing stuff
 
+/** Close the filehandle so this object can be delete. */
+DtaDiskNVMe::~DtaDiskNVMe()
+{
+    LOG(D1) << "Destroying DtaDiskNVMe";
+}
 
-
-DtaDiskNVMe::DtaDiskNVMe() {};
-void DtaDiskNVMe::init(const char * devref)
+void DtaDiskNVMe::init(const char* devref)
 {
     LOG(D1) << "Creating DtaDiskNVMe::DtaDiskNVMe() " << devref;
 
@@ -94,14 +112,14 @@ void DtaDiskNVMe::init(const char * devref)
                       OPEN_EXISTING,
                       0,
                       NULL);
-    if (INVALID_HANDLE_VALUE == hDev) 
+    if (INVALID_HANDLE_VALUE == hDev)
         return;
-    else 
+    else
         isOpen = TRUE;
 }
 
 uint8_t DtaDiskNVMe::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16_t comID,
-                        void * buffer, uint16_t bufferlen)
+                        void* buffer, uint32_t bufferlen)
 {
     UNREFERENCED_PARAMETER(cmd);
     UNREFERENCED_PARAMETER(protocol);
@@ -124,9 +142,6 @@ void DtaDiskNVMe::identify(OPAL_DiskInfo& disk_info)
     DWORD dwReturned = 0;
     BOOL iorc = 0;
 
-    PSTORAGE_PROPERTY_QUERY query = NULL;
-    PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
-    PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
     //  This buffer allocation is needed because the STORAGE_PROPERTY_QUERY has additional data
     // that the nvme driver doesn't use ???????????????????
     /* ****************************************************************************************
@@ -148,21 +163,19 @@ void DtaDiskNVMe::identify(OPAL_DiskInfo& disk_info)
     //
     ZeroMemory(buffer, bufferLength);
 
-    query = (PSTORAGE_PROPERTY_QUERY)buffer;
+    PSTORAGE_PROPERTY_QUERY query{(PSTORAGE_PROPERTY_QUERY)buffer};
     /* ****************************************************************************************
     !!DANGER WILL ROBINSON!! !!DANGER WILL ROBINSON!! !!DANGER WILL ROBINSON!!
     This buffer definition causes the STORAGE_PROTOCOL_SPECIFIC_DATA to OVERLAY the
     STORAGE_PROPERTY_QUERY.AdditionalParameters field
     * **************************************************************************************** */
-    protocolDataDescr = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR)buffer;
-    protocolData = (PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters;
-    /* */
+    PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData{(PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters};
+
     query->PropertyId = StorageAdapterProtocolSpecificProperty;
     query->QueryType = PropertyStandardQuery;
 
     protocolData->ProtocolType = ProtocolTypeNvme;
     protocolData->DataType = NVMeDataTypeIdentify;
-    //  protocolData->ProtocolDataRequestValue = NVME_IDENTIFY_CNS_CONTROLLER;
     protocolData->ProtocolDataRequestSubValue = 0;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
     protocolData->ProtocolDataLength = NVME_MAX_LOG_SIZE;
@@ -170,27 +183,16 @@ void DtaDiskNVMe::identify(OPAL_DiskInfo& disk_info)
     iorc = DeviceIoControl(hDev, IOCTL_STORAGE_QUERY_PROPERTY,
         buffer, bufferLength, buffer, bufferLength, &dwReturned, NULL);
 
-//
-//
-//
-    disk_info.devType = DEVICE_TYPE_NVME;
+    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_NVME;
     results = (UINT8 *)buffer + FIELD_OFFSET(STORAGE_PROPERTY_QUERY, AdditionalParameters)
         + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
+
     results += 4;
     memcpy(disk_info.serialNum, results, sizeof(disk_info.serialNum));
     results += sizeof(disk_info.serialNum);
     memcpy(disk_info.modelNum, results, sizeof(disk_info.modelNum));
     results += sizeof(disk_info.modelNum);
     memcpy(disk_info.firmwareRev, results, sizeof(disk_info.firmwareRev));
-    
 
     return;
-}
-
-/** Close the filehandle so this object can be delete. */
-DtaDiskNVMe::~DtaDiskNVMe()
-{
-    LOG(D1) << "Destroying DtaDiskNVMe";
-    CloseHandle(hDev);
-
 }
