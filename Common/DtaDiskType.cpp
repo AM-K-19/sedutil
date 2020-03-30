@@ -28,7 +28,9 @@ using namespace std;
 
 DtaDiskType::~DtaDiskType()
 {
+#ifdef _MSC_VER
     CloseHandle(hDev);
+#endif
 }
 
 void DtaDiskType::identify(OPAL_DiskInfo& disk_info) {}

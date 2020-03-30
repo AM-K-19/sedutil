@@ -54,5 +54,7 @@ public:
 
 protected:
     bool isOpen{false};
+#ifdef _MSC_VER
     HANDLE hDev{0};     /**< Windows device handle */
+#endif
 };

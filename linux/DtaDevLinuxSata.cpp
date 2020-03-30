@@ -36,7 +36,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include "DtaHexDump.h"
 //
 // taken from <scsi/scsi.h> to avoid SCSI/ATA name collision
-// 
+//
 
 /*
  *  Status codes
@@ -50,7 +50,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #define INTERMEDIATE_C_GOOD  0x0a
 #define RESERVATION_CONFLICT 0x0c
 #define COMMAND_TERMINATED   0x11
-#define QUEUE_FULL  
+#define QUEUE_FULL
 
 using namespace std;
 
@@ -245,7 +245,7 @@ void DtaDevLinuxSata::identify(OPAL_DiskInfo& disk_info)
         IFLOG(D4) DtaHexDump(cdb, sizeof (cdb));
         LOG(D4) << "sense after ";
         IFLOG(D4) DtaHexDump(sense, sizeof (sense));
-        disk_info.devType = DEVICE_TYPE_OTHER;
+        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
         identify_SAS(&disk_info);
         return;
     }
@@ -260,7 +260,7 @@ void DtaDevLinuxSata::identify(OPAL_DiskInfo& disk_info)
     kopts.open("/sys/module/libata/parameters/allow_tpm", ios::in);
     if (!kopts) {
 	LOG(W) << "Unable to verify Kernel flag libata.allow_tpm ";
-    } 
+    }
     else {
         if('1' !=  kopts.get()) {
             LOG(E) << "The Kernel flag libata.allow_tpm is not set correctly";
@@ -270,13 +270,13 @@ void DtaDevLinuxSata::identify(OPAL_DiskInfo& disk_info)
     }
 
     if (!(memcmp(nullz.data(), buffer, 512))) {
-        disk_info.devType = DEVICE_TYPE_OTHER;
+        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
         identify_SAS(&disk_info);
         return;
     }
     IDENTIFY_RESPONSE * id = (IDENTIFY_RESPONSE *) buffer;
 //    disk_info->devType = id->devType;
-    disk_info.devType = DEVICE_TYPE_ATA;
+    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_ATA;
 //   memcpy(disk_info.serialNum, id->serialNum, sizeof (disk_info.serialNum));
 //   memcpy(disk_info.firmwareRev, id->firmwareRev, sizeof (disk_info.firmwareRev));
 //   memcpy(disk_info.modelNum, id->modelNum, sizeof (disk_info.modelNum));
@@ -310,7 +310,7 @@ uint8_t DtaDevLinuxSata::sendCmd_SAS(ATACOMMAND cmd, uint8_t protocol, uint16_t 
     memset(&sense, 0, sizeof (sense));
     memset(&sg, 0, sizeof (sg));
 
-  
+
         // initialize SCSI CDB
         switch(cmd)
         {
@@ -363,7 +363,7 @@ uint8_t DtaDevLinuxSata::sendCmd_SAS(ATACOMMAND cmd, uint8_t protocol, uint16_t 
             IFLOG(D4) DtaHexDump(sense, sizeof (sense));
             return 0xff;
         }
-    
+
         // check for successful target completion
         if (sg.masked_status != GOOD)
         {
@@ -377,7 +377,7 @@ uint8_t DtaDevLinuxSata::sendCmd_SAS(ATACOMMAND cmd, uint8_t protocol, uint16_t 
         // success
         return 0x00;
     }
-    
+
 static void safecopy(uint8_t * dst, size_t dstsize, uint8_t * src, size_t srcsize)
 {
     const size_t size = min(dstsize, srcsize);
@@ -424,7 +424,7 @@ void DtaDevLinuxSata::identify_SAS(OPAL_DiskInfo *disk_info)
         IFLOG(D4) DtaHexDump(cdb, sizeof (cdb));
         LOG(D4) << "sense after ";
         IFLOG(D4) DtaHexDump(sense, sizeof (sense));
-        disk_info->devType = DEVICE_TYPE_OTHER;
+        disk_info->devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
         free(buffer);
         return;
     }
@@ -436,14 +436,14 @@ void DtaDevLinuxSata::identify_SAS(OPAL_DiskInfo *disk_info)
         IFLOG(D4) DtaHexDump(cdb, sizeof (cdb));
         LOG(D4) << "sense after ";
         IFLOG(D4) DtaHexDump(sense, sizeof (sense));
-        disk_info->devType = DEVICE_TYPE_OTHER;
+        disk_info->devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
         free(buffer);
         return;
     }
 
     // response is a standard INQUIRY (at least 36 bytes)
     auto resp = (CScsiCmdInquiry_StandardData *) buffer;
- 
+
     // make sure SCSI target is disk
     if (sg.dxfer_len - sg.resid != sizeof(CScsiCmdInquiry_StandardData)
         || resp->m_PeripheralDeviceType != 0x0)
@@ -452,7 +452,7 @@ void DtaDevLinuxSata::identify_SAS(OPAL_DiskInfo *disk_info)
         IFLOG(D4) DtaHexDump(cdb, sizeof (cdb));
         LOG(D4) << "sense after ";
         IFLOG(D4) DtaHexDump(sense, sizeof (sense));
-        disk_info->devType = DEVICE_TYPE_OTHER;
+        disk_info->devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
         free(buffer);
         return;
     }
@@ -463,7 +463,7 @@ void DtaDevLinuxSata::identify_SAS(OPAL_DiskInfo *disk_info)
     safecopy(disk_info->modelNum, sizeof(disk_info->modelNum), resp->m_ProductId, sizeof(resp->m_ProductId));
 
     // device is apparently a SCSI disk
-    disk_info->devType = DEVICE_TYPE_SAS;
+    disk_info->devType = DTA_DEVICE_TYPE::DEVICE_TYPE_SAS;
     isSAS = 1;
 
     // free buffer and return
