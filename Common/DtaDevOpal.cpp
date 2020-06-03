@@ -1249,7 +1249,7 @@ uint8_t DtaDevOpal::loadDS(uint8_t index, uint32_t offset, char * password, char
 	for (int i = 0; i < 8; i++) {
 		DS.push_back(OPALUID[OPAL_UID::OPAL_DATASTORE][i]);
 	}
-	DS[8] = index;
+	DS[4] = index;
 
 	while (!pbafile.eof()) {
 		if (eofpos == filepos) break;
