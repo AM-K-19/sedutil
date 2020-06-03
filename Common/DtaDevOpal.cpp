@@ -1205,6 +1205,96 @@ uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
 	return 0;
 }
 
+uint8_t DtaDevOpal::loadDS(uint8_t index, uint32_t offset, char * password, char * filename) {
+	LOG(D1) << "Entering DtaDevOpal::loadDS()" << filename << " " << dev;
+	uint8_t lastRC;
+	uint32_t blockSize;
+	uint32_t filepos = 0;
+	uint32_t eofpos;
+	ifstream pbafile;
+	(MAX_BUFFER_LENGTH > tperMaxPacket) ? blockSize = tperMaxPacket : blockSize = MAX_BUFFER_LENGTH;
+	if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
+	vector <uint8_t> buffer, lengthtoken;
+	blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
+	buffer.resize(blockSize);
+	pbafile.open(filename, ios::in | ios::binary);
+	if (!pbafile) {
+		LOG(E) << "Unable to open DataStore image file " << filename;
+		return DTAERROR_OPEN_ERR;
+	}
+	pbafile.seekg(0, pbafile.end);
+	eofpos = (uint32_t) pbafile.tellg(); 
+	pbafile.seekg(0, pbafile.beg);
+
+	DtaCommand *cmd = new DtaCommand();
+	if (NULL == cmd) {
+		LOG(E) << "Unable to create command object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+
+	session = new DtaSession(this);
+	if (NULL == session) {
+		LOG(E) << "Unable to create session object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+		delete cmd;
+		delete session;
+		pbafile.close();
+		return lastRC;
+	}
+	LOG(I) << "Writing DS[" << (int)index << "] image at "<< offset << " to " << dev;
+	vector<uint8_t> DS;
+	DS.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+	for (int i = 0; i < 8; i++) {
+		DS.push_back(OPALUID[OPAL_UID::OPAL_DATASTORE][i]);
+	}
+	DS[8] = index;
+
+	while (!pbafile.eof()) {
+		if (eofpos == filepos) break;
+		if ((eofpos - filepos) < blockSize) {
+			blockSize = eofpos - filepos; // handle a short last block
+			buffer.resize(blockSize);
+		}
+		lengthtoken.clear();
+		lengthtoken.push_back(0xe2);
+		lengthtoken.push_back((uint8_t) ((blockSize >> 16) & 0x000000ff));
+		lengthtoken.push_back((uint8_t)((blockSize >> 8) & 0x000000ff));
+		lengthtoken.push_back((uint8_t)(blockSize & 0x000000ff));
+		pbafile.read((char *)buffer.data(), blockSize);
+		cmd->reset(OPAL_UID::OPAL_DATASTORE, OPAL_METHOD::SET);
+		cmd->changeInvokingUid(DS);
+		cmd->addToken(OPAL_TOKEN::STARTLIST);
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+		cmd->addToken(OPAL_TOKEN::WHERE);
+		cmd->addToken(filepos + offset);
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+		cmd->addToken(OPAL_TOKEN::VALUES);
+		cmd->addToken(lengthtoken);
+		cmd->addToken(buffer);
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+		cmd->addToken(OPAL_TOKEN::ENDLIST);
+		cmd->complete();
+		if ((lastRC = session->sendCommand(cmd, response)) != 0) {
+			delete cmd;
+			delete session;
+			pbafile.close();
+			return lastRC;
+		}
+		filepos += blockSize;
+		cout << filepos << " of " << eofpos << " " << (uint16_t) (((float)filepos/(float)eofpos) * 100) << "% blk=" << blockSize << " \r";
+	}
+	cout << "\n";
+	delete cmd;
+	delete session;
+	pbafile.close();
+	LOG(I) << "DS image  " << filename << " written to " << dev;
+	LOG(D1) << "Exiting DtaDevOpal::loadDS()";
+	return 0;
+}
+
 uint8_t DtaDevOpal::activateLockingSP(char * password)
 {
 	LOG(D1) << "Entering DtaDevOpal::activateLockingSP()";

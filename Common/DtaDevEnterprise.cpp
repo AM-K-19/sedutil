@@ -998,6 +998,13 @@ uint8_t DtaDevEnterprise::loadPBA(char * password, char * filename) {
 	LOG(D1) << "Exiting DtaDevEnterprise::loadPBAimage()";
 	return DTAERROR_INVALID_PARAMETER;
 }
+uint8_t DtaDevEnterprise::loadDS(uint8_t index, uint32_t offset, char * password, char * filename) {
+	LOG(D1) << "Entering DtaDevEnterprise::loadDS()" << filename << " " << dev;
+	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << filename; }
+	LOG(I) << "DataStores is not yet implemented for the enterprise SSCs ";
+	LOG(D1) << "Exiting DtaDevEnterprise::loadDS()";
+	return DTAERROR_INVALID_PARAMETER;
+}
 uint8_t DtaDevEnterprise::activateLockingSP(char * password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::activateLockingSP()";

@@ -177,6 +177,11 @@ public:
          * @param filename the filename of the disk image
          */
 	uint8_t loadPBA(char * password, char * filename);
+		/** Loads a disk image file to the DataStore table.
+			* @param password the password for the administrative authority with access to the table
+			* @param filename the filename of the disk image
+			*/
+	uint8_t loadDS(uint8_t index, uint32_t offset, char * password, char * filename);
          /** User command to prepare the device for management by sedutil. 
          * Specific to the SSC that the device supports
          * @param password the password that is to be assigned to the SSC master entities 

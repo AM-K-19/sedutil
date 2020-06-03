@@ -221,10 +221,15 @@ public:
 	    * @param password Password of administrative authority for locking range
 	    */
 	uint8_t eraseLockingRange(uint8_t lockingrange, char * password);
-        /** Loads a disk image file to the shadow MBR table.
-         * @param password the password for the administrative authority with access to the table
-         * @param filename the filename of the disk image
-         */
+	    /** Loads a disk image file to the datastore table.
+	     * @param password the password for the administrative authority with access to the table
+	     * @param filename the filename of the disk image
+	     */
+	uint8_t loadDS(uint8_t index, uint32_t offset, char * password, char * filename);
+	/** Loads a disk image file to the shadow MBR table.
+	 * @param password the password for the administrative authority with access to the table
+	 * @param filename the filename of the disk image
+	 */
 	uint8_t loadPBA(char * password, char * filename);
         /** User command to prepare the device for management by sedutil. 
          * Specific to the SSC that the device supports

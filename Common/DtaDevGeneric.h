@@ -86,6 +86,11 @@ public:
          * @param newpassword  value password is to be changed to
          */
 	 uint8_t setNewPassword_SUM(char * password, char * userid, char * newpassword) ;
+       /** Loads a disk image file to the DataStore table.
+      * @param password the password for the administrative authority with access to the table
+      * @param filename the filename of the disk image
+      */
+    uint8_t loadDS(uint8_t index, uint32_t offset, char * password, char * filename) ;
           /** Loads a disk image file to the shadow MBR table.
          * @param password the password for the administrative authority with access to the table
          * @param filename the filename of the disk image

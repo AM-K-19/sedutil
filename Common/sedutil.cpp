@@ -263,6 +263,10 @@ int main(int argc, char * argv[])
 		LOG(D) << "Performing cmdDump ";
 		return d->rawCmd(argv[argc - 7], argv[argc - 6], argv[argc - 5], argv[argc - 4], argv[argc - 3], argv[argc - 2]);
 		break;
+	case sedutiloption::loadDS:
+	        LOG(D) << "Loading DS image " << argv[opts.pbafile] << " to " << opts.device;
+	        return d->loadDS( atol(argv[opts.ds_index]), atol(argv[opts.ds_offset]) , argv[opts.password], argv[opts.pbafile]);
+			break;
     default:
         LOG(E) << "Unable to determine what you want to do ";
         usage();

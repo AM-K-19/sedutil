@@ -96,6 +96,10 @@ void usage()
     printf("--printDefaultPassword <device>\n");
     printf("                                print MSID \n");
     printf("\n");
+    printf("--rawCmd <params> <method ID> <invoking ID> <passwd> <authority> <SP> <device>\n");
+    printf("--loadDS  <index> <offset> <Admin1Password> <file> <device>\n");
+    printf("                                Write <file> to DataStore1+<index>, starting at <offset>\n");
+
     printf("Examples \n");
     printf("sedutil-cli --scan \n");
 	printf("sedutil-cli --query %s \n", DEVICEEXAMPLE);
@@ -176,6 +180,12 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(loadPBAimage, 3) OPTION_IS(password) OPTION_IS(pbafile) 
 			OPTION_IS(device) END_OPTION
+    BEGIN_OPTION(loadDS, 5)
+    OPTION_IS(ds_index) 
+    OPTION_IS(ds_offset) 
+    OPTION_IS(password) 
+    OPTION_IS(pbafile) 
+    OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(revertTPer, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(revertNoErase, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(PSIDrevert, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION

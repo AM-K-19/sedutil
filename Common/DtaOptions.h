@@ -41,7 +41,8 @@ typedef struct _DTA_OPTIONS {
 	uint8_t lockingstate;  /**< locking state to set a lockingrange to */
 	uint8_t lrstart;		/** the starting block of a lockingrange */
 	uint8_t lrlength;		/** the length in blocks of a lockingrange */
-
+	uint8_t ds_offset; /*DataStore access offset start */
+	uint8_t ds_index; /*DataStore access offset start */
 	bool no_hash_passwords; /** global parameter, disables hashing of passwords */
 	sedutiloutput output_format;
 } DTA_OPTIONS;
@@ -96,6 +97,7 @@ typedef enum _sedutiloption {
 	objDump,
     printDefaultPassword,
 	rawCmd,
+	loadDS
 
 } sedutiloption;
 /** verify the number of arguments passed */
