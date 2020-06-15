@@ -56,6 +56,11 @@ DtaDevGeneric::DtaDevGeneric(const char * devref)
 	DtaDevOS::init(devref);
 }
 
+DtaDevGeneric::DtaDevGeneric(const std::string& devref)
+{
+	DtaDevOS::init(devref.c_str());
+}
+
 DtaDevGeneric::~DtaDevGeneric()
 {
 }
@@ -63,7 +68,7 @@ void DtaDevGeneric::init(const char * devref)
 {
 }
 uint8NOCODE(initialSetup, char *password)
-uint8NOCODE(configureLockingRange,uint8_t lockingrange, 
+uint8NOCODE(configureLockingRange,uint8_t lockingrange,
 	uint8_t enabled, char * password)
 uint8NOCODE(revertLockingSP,char * password, uint8_t keep)
 uint8NOCODE(setup_SUM, uint8_t lockingrange, uint64_t start, uint64_t length, char *Admin1Password, char * password)
@@ -95,8 +100,8 @@ uint8NOCODE(setSIDPassword,char * oldpassword, char * newpassword,
 	uint8_t hasholdpwd, uint8_t hashnewpwd)
 uint16_t DtaDevGeneric::comID()
 {
-	LOG(E) << "Generic Device class does not support function " << "comID" << std::endl; 
-		return 0xff; 
+	LOG(E) << "Generic Device class does not support function " << "comID" << std::endl;
+		return 0xff;
 }
 
 uint8NOCODE(exec,DtaCommand * cmd, DtaResponse & resp, uint8_t protocol)
