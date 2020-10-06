@@ -93,6 +93,7 @@ uint8NOCODE(eraseLockingRange,uint8_t lockingrange, char * password)
 uint8NOCODE(printDefaultPassword);
 uint8NOCODE(loadPBA,char * password, char * filename)
 uint8NOCODE(loadDS, uint8_t index, uint32_t offset, char * password, char * filename)
+uint8NOCODE(saveDS, uint8_t index, uint32_t offset, uint32_t length, char * password, char * filename)
 uint8NOCODE(activateLockingSP,char * password)
 uint8NOCODE(activateLockingSP_SUM,uint8_t lockingrange, char * password)
 uint8NOCODE(eraseLockingRange_SUM, uint8_t lockingrange, char * password)

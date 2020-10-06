@@ -152,6 +152,15 @@ public:
 	 * @param filename the filename of the disk image
 	 */
 	virtual uint8_t loadDS(uint8_t index, uint32_t offset, char * password, char * filename) = 0;
+	/** Save the contents of the DataStore table to file.
+    * @param index - datastore index - starting at 1
+    * @param offset - starting byte offset into the datastore table.
+    * @param length - length to read in bytes
+    * @param password the password for the administrative authority with access to the table
+    * @param filename the filename of the disk image
+    */
+    virtual uint8_t saveDS(uint8_t index, uint32_t offset, uint32_t length, char * password, char * filename) = 0;
+
 	/** Change the locking state of a locking range
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param lockingstate  the locking state to set
@@ -299,5 +308,6 @@ protected:
 	DtaSession *session;  /**< shared session object pointer */
 	uint8_t discovery0buffer[MIN_BUFFER_LENGTH + IO_BUFFER_ALIGNMENT];
 	uint32_t tperMaxPacket = 2048;
+	uint32_t tperMaxResponsePacket = 2048;
 	uint32_t tperMaxToken = 1950;
 };

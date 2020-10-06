@@ -1005,6 +1005,21 @@ uint8_t DtaDevEnterprise::loadDS(uint8_t index, uint32_t offset, char * password
 	LOG(D1) << "Exiting DtaDevEnterprise::loadDS()";
 	return DTAERROR_INVALID_PARAMETER;
 }
+/** Save the contents of the DataStore table to file.
+  * @param index - datastore index - starting at 1
+  * @param offset - starting byte offset into the datastore table.
+  * @param length - length to read in bytes
+  * @param password the password for the administrative authority with access to the table
+  * @param filename the filename of the disk image
+  */
+uint8_t DtaDevEnterprise::saveDS(uint8_t index, uint32_t offset, uint32_t length, char * password, char * filename) {
+    LOG(D1) << "Entering DtaDevEnterprise::saveDS()" << filename << " " << dev;
+  	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << filename; }
+  	LOG(I) << "DataStores is not yet implemented for the enterprise SSCs ";
+  	LOG(D1) << "Exiting DtaDevEnterprise::saveDS()";
+  	return DTAERROR_INVALID_PARAMETER;
+}
+
 uint8_t DtaDevEnterprise::activateLockingSP(char * password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::activateLockingSP()";

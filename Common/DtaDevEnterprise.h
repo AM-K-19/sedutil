@@ -182,6 +182,15 @@ public:
 			* @param filename the filename of the disk image
 			*/
 	uint8_t loadDS(uint8_t index, uint32_t offset, char * password, char * filename);
+	/** Save the contents of the DataStore table to file.
+    * @param index - datastore index - starting at 1
+    * @param offset - starting byte offset into the datastore table.
+    * @param length - length to read in bytes
+    * @param password the password for the administrative authority with access to the table
+    * @param filename the filename of the disk image
+    */
+  uint8_t saveDS(uint8_t index, uint32_t offset, uint32_t length, char * password, char * filename);
+
          /** User command to prepare the device for management by sedutil. 
          * Specific to the SSC that the device supports
          * @param password the password that is to be assigned to the SSC master entities 

@@ -99,8 +99,10 @@ void usage()
     printf("                                print MSID \n");
     printf("\n");
     printf("--rawCmd <params> <method ID> <invoking ID> <passwd> <authority> <SP> <device>\n");
-    printf("--loadDS  <index> <offset> <Admin1Password> <file> <device>\n");
-    printf("                                Write <file> to DataStore1+<index>, starting at <offset>\n");
+    printf("--loadDS <Admin1Password> <file> <device>\n");
+    printf("                                Write <file> to DataStore\n");
+    printf("--saveDS <Admin1Password> <length> <file> <device>\n");
+    printf("                                Read <lengh> bytes of DataStore to <file>\n");
 
     printf("Examples \n");
     printf("sedutil-cli --scan \n");
@@ -184,6 +186,11 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 		BEGIN_OPTION(loadPBAimage, 3) OPTION_IS(password) OPTION_IS(pbafile) 
 			OPTION_IS(device) END_OPTION
     BEGIN_OPTION(loadDS, 3)
+    OPTION_IS(password) 
+    OPTION_IS(pbafile) 
+    OPTION_IS(device) END_OPTION
+    BEGIN_OPTION(saveDS, 4)
+    OPTION_IS(lrlength)
     OPTION_IS(password) 
     OPTION_IS(pbafile) 
     OPTION_IS(device) END_OPTION

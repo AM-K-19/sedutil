@@ -1243,7 +1243,7 @@ uint8_t DtaDevOpal::loadDS(uint8_t index, uint32_t offset, char * password, char
 		pbafile.close();
 		return lastRC;
 	}
-	LOG(I) << "Writing DS[" << (int)index << "] image at "<< offset << " to " << dev;
+	LOG(D1) << "Writing DS[" << (int)index << "] image at "<< offset << " to " << dev;
 	vector<uint8_t> DS;
 	DS.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
 	for (int i = 0; i < 8; i++) {
@@ -1278,7 +1278,7 @@ uint8_t DtaDevOpal::loadDS(uint8_t index, uint32_t offset, char * password, char
 		cmd->addToken(OPAL_TOKEN::ENDLIST);
 		cmd->complete();
 		if ((lastRC = session->sendCommand(cmd, response)) != 0) {
-			LOG(I) << "DS write failed writing to " << dev;
+			LOG(E) << "DS write failed writing to " << dev;
 			delete cmd;
 			delete session;
 			pbafile.close();
@@ -1291,8 +1291,105 @@ uint8_t DtaDevOpal::loadDS(uint8_t index, uint32_t offset, char * password, char
 	delete cmd;
 	delete session;
 	pbafile.close();
-	LOG(I) << "DS image  " << filename << " written to " << dev;
+	LOG(D1) << "DS image  " << filename << " written to " << dev;
 	LOG(D1) << "Exiting DtaDevOpal::loadDS()";
+	return 0;
+}
+
+/** Save the contents of the DataStore table to file.
+	* @param index - datastore index - starting at 1
+	* @param offset - starting byte offset into the datastore table.
+	* @param length - length to read in bytes
+	* @param password the password for the administrative authority with access to the table
+	* @param filename the filename of the disk image
+	*/
+uint8_t DtaDevOpal::saveDS(uint8_t index, uint32_t offset, uint32_t length, char * password, char * filename) {
+	uint8_t lastRC;
+	uint32_t blockSize;
+	uint32_t filepos = 0;
+	uint32_t eofpos;
+	ofstream pbafile;
+	(MAX_BUFFER_LENGTH > tperMaxResponsePacket) ? blockSize = tperMaxResponsePacket : blockSize = MAX_BUFFER_LENGTH;
+	if (blockSize > (HOST_MAX_TOKEN_SIZE - 4)) blockSize = HOST_MAX_TOKEN_SIZE - 4;
+	if (blockSize > HOST_MAX_COM_PACKET_SIZE) blockSize = HOST_MAX_COM_PACKET_SIZE;
+	vector <uint8_t> buffer, lengthtoken;
+	blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
+	LOG(D1) << "Entering DtaDevOpal::saveDS()" << filename << " " << dev << " block size " << blockSize;
+	buffer.resize(blockSize);
+	pbafile.open(filename, ios::out | ios::binary);
+	if (!pbafile) {
+		LOG(E) << "Unable to open DataStore image file " << filename;
+		return DTAERROR_OPEN_ERR;
+	}
+	pbafile.seekp(0, pbafile.end);
+	eofpos = length; 
+	pbafile.seekp(0, pbafile.beg);
+
+	DtaCommand *cmd = new DtaCommand();
+	if (NULL == cmd) {
+		LOG(E) << "Unable to create command object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+
+	session = new DtaSession(this);
+	if (NULL == session) {
+		LOG(E) << "Unable to create session object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+		delete cmd;
+		delete session;
+		pbafile.close();
+		return lastRC;
+	}
+	LOG(D1) << "Reading DS[" << (int)index << "] image at "<< offset << " to " << dev;
+	vector<uint8_t> DS;
+	DS.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+	for (int i = 0; i < 8; i++) {
+		DS.push_back(OPALUID[OPAL_UID::OPAL_DATASTORE][i]);
+	}
+	DS[4] = index;
+
+	while (eofpos != filepos) {
+		if ((eofpos - filepos) < blockSize) {
+			blockSize = eofpos - filepos; // handle a short last block
+			buffer.resize(blockSize);
+		}
+		cmd->reset(OPAL_UID::OPAL_DATASTORE, OPAL_METHOD::GET);
+		cmd->changeInvokingUid(DS);
+		cmd->addToken(OPAL_TOKEN::STARTLIST);
+		cmd->addToken(OPAL_TOKEN::STARTLIST);
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+		cmd->addToken(OPAL_TOKEN::STARTROW);
+		cmd->addToken(filepos);
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+		cmd->addToken(OPAL_TOKEN::ENDROW);
+		cmd->addToken(filepos + blockSize - 1);
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+		cmd->addToken(OPAL_TOKEN::ENDLIST);
+		cmd->addToken(OPAL_TOKEN::ENDLIST);
+
+		cmd->complete();
+		if ((lastRC = session->sendCommand(cmd, response)) != 0) {
+			LOG(I) << "DS read failed accessing " << dev;
+			delete cmd;
+			delete session;
+			pbafile.close();
+			return lastRC;
+		}
+		response.getBytes(1, buffer.data());
+		pbafile.write((char *)buffer.data(), blockSize);
+		
+		filepos += blockSize;
+		cout << filepos << " of " << eofpos << " " << (uint16_t) (((float)filepos/(float)eofpos) * 100) << "% blk=" << blockSize << " \r";
+	}
+	cout << "\n";
+	delete cmd;
+	delete session;
+	pbafile.close();
+	LOG(D1) << "DS image  " << filename << " written to " << dev;
+	LOG(D1) << "Exiting DtaDevOpal::saveDS()";
 	return 0;
 }
 
@@ -1703,15 +1800,15 @@ uint8_t DtaDevOpal::properties()
 	props->addToken(OPAL_TOKEN::STARTLIST);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxComPacketSize");
-	props->addToken(2048);
+	props->addToken(HOST_MAX_COM_PACKET_SIZE);
 	props->addToken(OPAL_TOKEN::ENDNAME);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxPacketSize");
-	props->addToken(2028);
+	props->addToken(HOST_MAX_PACKET_SIZE);
 	props->addToken(OPAL_TOKEN::ENDNAME);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxIndTokenSize");
-	props->addToken(1992);
+	props->addToken(HOST_MAX_TOKEN_SIZE);
 	props->addToken(OPAL_TOKEN::ENDNAME);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxPackets");
@@ -1740,13 +1837,14 @@ uint8_t DtaDevOpal::properties()
 			if (OPAL_TOKEN::DTA_TOKENID_BYTESTRING != propertiesResponse.tokenIs(i + 1))
 				break;
 			else
-				if(!strcasecmp("MaxComPacketSize",propertiesResponse.getString(i + 1).c_str()))
+				if(!strcasecmp("MaxComPacketSize",propertiesResponse.getString(i + 1).c_str())) {
 					tperMaxPacket = propertiesResponse.getUint32(i + 2);
-				else
-					if (!strcasecmp("MaxIndTokenSize", propertiesResponse.getString(i + 1).c_str())) {
-						tperMaxToken = propertiesResponse.getUint32(i + 2);
-						break;
-					}
+				} else if (!strcasecmp("MaxResponseComPacketSize", propertiesResponse.getString(i + 1).c_str())) {
+					tperMaxResponsePacket = propertiesResponse.getUint32(i + 2);
+				} else if (!strcasecmp("MaxIndTokenSize", propertiesResponse.getString(i + 1).c_str())) {
+					tperMaxToken = propertiesResponse.getUint32(i + 2);
+					break;
+				}
 
 			i += 2;
 		}
