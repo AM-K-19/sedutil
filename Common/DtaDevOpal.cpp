@@ -71,8 +71,8 @@ uint8_t DtaDevOpal::initialSetup(char * password)
 		return lastRC;
 	}
 	if ((lastRC = setMBRDone(1, password)) != 0){
-		LOG(E) << "Initial setup failed - unable to Enable MBR shadow";
-		return lastRC;
+		LOG(I) << "Initial setup - skipping MBR shadow config";
+		return 0;
 	}
 	if ((lastRC = setMBREnable(1, password)) != 0){
 		LOG(E) << "Initial setup failed - unable to Enable MBR shadow";
