@@ -31,14 +31,20 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include "DtaStructures.h"
 #include "DtaHexDump.h"
 
-using namespace std;
-DtaDiskATA::DtaDiskATA() {};
+
+/** Close the filehandle so this object can be delete. */
+DtaDiskATA::~DtaDiskATA()
+{
+    LOG(D1) << "Destroying DtaDiskATA";
+    _aligned_free(ataPointer);
+}
+
 void DtaDiskATA::init(const char * devref)
 {
-    LOG(D1) << "Creating DtaDiskATA::DtaDiskATA() " << devref;
-    ATA_PASS_THROUGH_DIRECT * ata =
-            (ATA_PASS_THROUGH_DIRECT *) _aligned_malloc(sizeof (ATA_PASS_THROUGH_DIRECT), 8);
-    ataPointer = (void *) ata;
+     LOG(D1) << "Creating DtaDiskATA::DtaDiskATA() " << devref;
+     ATA_PASS_THROUGH_DIRECT* ata =
+            (ATA_PASS_THROUGH_DIRECT*) _aligned_malloc(sizeof (ATA_PASS_THROUGH_DIRECT), 8);
+     ataPointer = (void*) ata;
      hDev = CreateFile(devref,
                       GENERIC_WRITE | GENERIC_READ,
                       FILE_SHARE_WRITE | FILE_SHARE_READ,
@@ -46,11 +52,12 @@ void DtaDiskATA::init(const char * devref)
                       OPEN_EXISTING,
                       0,
                       NULL);
-    if (INVALID_HANDLE_VALUE == hDev) 
+    if (INVALID_HANDLE_VALUE == hDev)
 		return;
-    else 
+    else
         isOpen = TRUE;
 }
+
 uint8_t DtaDiskATA::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16_t comID,
                         void * buffer, uint32_t bufferlen)
 {
@@ -104,28 +111,29 @@ uint8_t DtaDiskATA::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16_t comID,
 }
 
 /** adds the IDENTIFY information to the disk_info structure */
-
 void DtaDiskATA::identify(OPAL_DiskInfo& disk_info)
 {
     LOG(D1) << "Entering DtaDiskATA::identify()";
-	vector<uint8_t> nullz(512, 0x00);
-    void * identifyResp = NULL;
+	std::vector<uint8_t> nullz(512, 0x00);
+    void* identifyResp{nullptr};
 	identifyResp = _aligned_malloc(MIN_BUFFER_LENGTH, IO_BUFFER_ALIGNMENT);
-    if (NULL == identifyResp) return;
+    if (nullptr == identifyResp) {
+        return;
+    }
     memset(identifyResp, 0, MIN_BUFFER_LENGTH);
     uint8_t iorc = sendCmd(IDENTIFY, 0x00, 0x0000, identifyResp, MIN_BUFFER_LENGTH);
     // TODO: figure out why iorc = 4
     if ((0x00 != iorc) && (0x04 != iorc)) {
-        LOG(D) << "IDENTIFY Failed " << (uint16_t) iorc;
+        LOG(D) << "IDENTIFY Failed " << (uint16_t)iorc;
         //ALIGNED_FREE(identifyResp);
         //return;
     }
 	if (!(memcmp(identifyResp, nullz.data(), 512))) {
-		disk_info.devType = DEVICE_TYPE_OTHER;
+		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
 		return;
 	}
-    IDENTIFY_RESPONSE * id = (IDENTIFY_RESPONSE *) identifyResp;
-    disk_info.devType = DEVICE_TYPE_ATA;
+    IDENTIFY_RESPONSE* id = (IDENTIFY_RESPONSE*) identifyResp;
+    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_ATA;
     for (int i = 0; i < sizeof (disk_info.serialNum); i += 2) {
         disk_info.serialNum[i] = id->serialNum[i + 1];
         disk_info.serialNum[i + 1] = id->serialNum[i];
@@ -142,10 +150,3 @@ void DtaDiskATA::identify(OPAL_DiskInfo& disk_info)
     return;
 }
 
-/** Close the filehandle so this object can be delete. */
-DtaDiskATA::~DtaDiskATA()
-{
-    LOG(D1) << "Destroying DtaDiskATA";
-    CloseHandle(hDev);
-    _aligned_free(ataPointer);
-}

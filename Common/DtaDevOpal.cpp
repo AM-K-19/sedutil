@@ -24,7 +24,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include<iomanip>
+#include <iomanip>
 #include "DtaDevOpal.h"
 #include "DtaHashPwd.h"
 #include "DtaEndianFixup.h"
@@ -71,8 +71,8 @@ uint8_t DtaDevOpal::initialSetup(char * password)
 		return lastRC;
 	}
 	if ((lastRC = setMBRDone(1, password)) != 0){
-		LOG(E) << "Initial setup failed - unable to Enable MBR shadow";
-		return lastRC;
+		LOG(I) << "Initial setup - skipping MBR shadow config";
+		return 0;
 	}
 	if ((lastRC = setMBREnable(1, password)) != 0){
 		LOG(E) << "Initial setup failed - unable to Enable MBR shadow";
@@ -587,7 +587,7 @@ uint8_t DtaDevOpal::rekeyLockingRange_SUM(vector<uint8_t> LR, vector<uint8_t>  U
 }
 uint8_t DtaDevOpal::setBandsEnabled(int16_t lockingrange, char * password)
 {
-	if (password == NULL) { LOG(D4) << "Password is NULL"; } // unreferenced formal paramater
+	if (password == NULL) { LOG(D4) << "Password is NULL"; } // unreferenced formal parameter
 	LOG(D1) << "Entering DtaDevOpal::setBandsEnabled()" << lockingrange << " " << dev;
 	LOG(I) << "setBandsEnabled is not implemented.  It is not part of the Opal SSC ";
 	LOG(D1) << "Exiting DtaDevOpal::setBandsEnabled()";

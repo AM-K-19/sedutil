@@ -18,10 +18,13 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
  * C:E********************************************************************** */
 #pragma once
+#ifndef DTA_STRUCTURES_H
+#define DTA_STRUCTURES_H
+
 #pragma pack(push)
 #pragma pack(1)
 
-#define FC_TPER		  0x0001
+#define FC_TPER       0x0001
 #define FC_LOCKING    0x0002
 #define FC_GEOMETRY   0x0003
 #define FC_ENTERPRISE 0x0100
@@ -29,22 +32,24 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #define FC_SINGLEUSER 0x0201
 #define FC_OPALV100   0x0200
 #define FC_OPALV200   0x0203
+
+
 /** The Discovery 0 Header. As defined in
 * Opal SSC Documentation
 */
-typedef struct _Discovery0Header {
+struct Discovery0Header {
     uint32_t length; /**< the lenght of the header 48 in 2.00.100*/
     uint32_t revision; /**< revision of the header 1 in 2.00.100 */
     uint32_t reserved01;
     uint32_t reserved02;
     // the remainder of the structure is vendor specific and will not be addressed now
-} Discovery0Header;
+};
 
 /** TPer Feature Descriptor. Contains flags indicating support for the
  * TPer features described in the OPAL specification. The names match the
  * OPAL terminology
  */
-typedef struct _Discovery0TPerFeatures {
+struct Discovery0TPerFeatures {
     uint16_t featureCode; /* 0x0001 in 2.00.100 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
@@ -71,13 +76,13 @@ typedef struct _Discovery0TPerFeatures {
     uint32_t reserved03;
     uint32_t reserved04;
     uint32_t reserved05;
-} Discovery0TPerFeatures;
+};
 
 /** Locking Feature Descriptor. Contains flags indicating support for the
  * locking features described in the OPAL specification. The names match the
  * OPAL terminology
  */
-typedef struct _Discovery0LockingFeatures {
+struct Discovery0LockingFeatures {
     uint16_t featureCode; /* 0x0002 in 2.00.100 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
@@ -104,13 +109,13 @@ typedef struct _Discovery0LockingFeatures {
     uint32_t reserved03;
     uint32_t reserved04;
     uint32_t reserved05;
-} Discovery0LockingFeatures;
+};
 
 /** Geometry Feature Descriptor. Contains flags indicating support for the
  * geometry features described in the OPAL specification. The names match the
  * OPAL terminology
  */
-typedef struct _Discovery0GeometryFeatures {
+struct Discovery0GeometryFeatures {
     uint16_t featureCode; /* 0x0003 in 2.00.100 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
@@ -125,11 +130,11 @@ typedef struct _Discovery0GeometryFeatures {
     uint32_t logicalBlockSize;
     uint64_t alignmentGranularity;
     uint64_t lowestAlighedLBA;
-} Discovery0GeometryFeatures;
+};
 
-/** Enterprise SSC Feature 
+/** Enterprise SSC Feature
  */
-typedef struct _Discovery0EnterpriseSSC {
+struct Discovery0EnterpriseSSC {
     uint16_t featureCode; /* 0x0100 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
@@ -147,21 +152,22 @@ typedef struct _Discovery0EnterpriseSSC {
     uint16_t reserved03;
     uint32_t reserved04;
     uint32_t reserved05;
-} Discovery0EnterpriseSSC;
+};
 
-/** Opal V1 feature 
+/** Opal V1 feature
  */
-typedef struct _Discovery0OpalV100 {
-	uint16_t featureCode; /* 0x0200 */
-	uint8_t reserved_v : 4;
-	uint8_t version : 4;
-	uint8_t length;
-	uint16_t baseComID;
-	uint16_t numberComIDs;
-} Discovery0OpalV100;
-/** Single User Mode feature 
+struct Discovery0OpalV100 {
+    uint16_t featureCode; /* 0x0200 */
+    uint8_t reserved_v : 4;
+    uint8_t version : 4;
+    uint8_t length;
+    uint16_t baseComID;
+    uint16_t numberComIDs;
+};
+
+/** Single User Mode feature
  */
-typedef struct _Discovery0SingleUserMode {
+struct Discovery0SingleUserMode {
     uint16_t featureCode; /* 0x0201 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
@@ -181,11 +187,11 @@ typedef struct _Discovery0SingleUserMode {
     uint8_t reserved02;
     uint16_t reserved03;
     uint32_t reserved04;
-} Discovery0SingleUserMode;
+};
 
 /** Additonal Datastores feature .
  */
-typedef struct _Discovery0DatastoreTable {
+struct Discovery0DatastoreTable {
     uint16_t featureCode; /* 0x0203 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
@@ -194,11 +200,11 @@ typedef struct _Discovery0DatastoreTable {
     uint16_t maxTables;
     uint32_t maxSizeTables;
     uint32_t tableSizeAlignment;
-} Discovery0DatastoreTable;
+};
 
-/** OPAL 2.0 feature 
+/** OPAL 2.0 feature
  */
-typedef struct _Discovery0OPALV200 {
+struct Discovery0OPALV200 {
     uint16_t featureCode; /* 0x0203 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
@@ -218,7 +224,8 @@ typedef struct _Discovery0OPALV200 {
     uint8_t revertedPIN;
     uint8_t reserved02;
     uint32_t reserved03;
-} Discovery0OPALV200;
+};
+
 /** Union of features used to parse the discovery 0 response */
 union Discovery0Features {
     Discovery0TPerFeatures TPer;
@@ -227,22 +234,22 @@ union Discovery0Features {
     Discovery0EnterpriseSSC enterpriseSSC;
     Discovery0SingleUserMode singleUserMode;
     Discovery0OPALV200 opalv200;
-	Discovery0OpalV100 opalv100;
+    Discovery0OpalV100 opalv100;
     Discovery0DatastoreTable datastore;
 };
 
 /** ComPacket (header) for transmissions. */
 
-typedef struct _OPALComPacket {
+struct OPALComPacket {
     uint32_t reserved0;
     uint8_t extendedComID[4];
     uint32_t outstandingData;
     uint32_t minTransfer;
     uint32_t length;
-} OPALComPacket;
+};
 
 /** Packet structure. */
-typedef struct _OPALPacket {
+struct OPALPacket {
     uint32_t TSN;
     uint32_t HSN;
     uint32_t seqNumber;
@@ -250,40 +257,67 @@ typedef struct _OPALPacket {
     uint16_t ackType;
     uint32_t acknowledgement;
     uint32_t length;
-} OPALPacket;
+};
 
 /** Data sub packet header */
-typedef struct _OPALDataSubPacket {
+struct OPALDataSubPacket {
     uint8_t reserved0[6];
     uint16_t kind;
     uint32_t length;
-} OPALDataSubPacket;
+};
+
 /** header of a response */
-typedef struct _OPALHeader {
+struct OPALHeader {
     OPALComPacket cp;
     OPALPacket pkt;
     OPALDataSubPacket subpkt;
-} OPALHeader;
+};
+
 /** ATA commands needed for TCG storage communication */
-typedef enum _ATACOMMAND {
+enum ATACOMMAND {
     IF_RECV = 0x5c,
     IF_SEND = 0x5e,
     IDENTIFY = 0xec,
-} ATACOMMAND;
+};
 
-typedef enum _DTA_DEVICE_TYPE {
+enum class DTA_DEVICE_TYPE {
     DEVICE_TYPE_ATA,
     DEVICE_TYPE_SAS,
     DEVICE_TYPE_NVME,
-	DEVICE_TYPE_USB,
+    DEVICE_TYPE_USB,
     DEVICE_TYPE_OTHER,
-} DTA_DEVICE_TYPE;
+};
+
+/** Write human-readable device type to a stream **/
+inline std::ostream& operator<<(std::ostream& os, const DTA_DEVICE_TYPE& type)
+{
+    switch (type)
+    {
+    case DTA_DEVICE_TYPE::DEVICE_TYPE_ATA:
+        os << "ATA";
+        break;
+    case DTA_DEVICE_TYPE::DEVICE_TYPE_SAS:
+        os << "SAS";
+        break;
+    case DTA_DEVICE_TYPE::DEVICE_TYPE_USB:
+        os << "USB";
+        break;
+    case DTA_DEVICE_TYPE::DEVICE_TYPE_NVME:
+        os << "NVMe";
+        break;
+    case DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER:
+    default:
+        os << "OTHER";
+        break;
+    };
+    return os;
+}
 
 /** structure to store Disk information. */
-typedef struct _OPAL_DiskInfo {
+struct OPAL_DiskInfo {
     // parsed the Function block?
-	uint8_t Unknown;
-	uint8_t VendorSpecific;
+    uint8_t Unknown;
+    uint8_t VendorSpecific;
     uint8_t TPer : 1;
     uint8_t Locking : 1;
     uint8_t Geometry : 1;
@@ -291,9 +325,9 @@ typedef struct _OPAL_DiskInfo {
     uint8_t SingleUser : 1;
     uint8_t DataStore : 1;
     uint8_t OPAL20 : 1;
-	uint8_t OPAL10 : 1;
-	uint8_t Properties : 1;
-	uint8_t ANY_OPAL_SSC : 1;
+    uint8_t OPAL10 : 1;
+    uint8_t Properties : 1;
+    uint8_t ANY_OPAL_SSC : 1;
     // values ONLY VALID IF FUNCTION ABOVE IS TRUE!!!!!
     uint8_t TPer_ACKNACK : 1;
     uint8_t TPer_async : 1;
@@ -321,8 +355,8 @@ typedef struct _OPAL_DiskInfo {
     uint16_t DataStore_maxTables;
     uint32_t DataStore_maxTableSize;
     uint32_t DataStore_alignment;
-	uint16_t OPAL10_basecomID;
-	uint16_t OPAL10_numcomIDs;
+    uint16_t OPAL10_basecomID;
+    uint16_t OPAL10_numcomIDs;
     uint16_t OPAL20_basecomID;
     uint16_t OPAL20_numcomIDs;
     uint8_t OPAL20_initialPIN;
@@ -333,14 +367,15 @@ typedef struct _OPAL_DiskInfo {
     // IDENTIFY information
     DTA_DEVICE_TYPE devType;
     uint8_t serialNum[20];
-	uint8_t null0;  // make sn a cstring
+    uint8_t null0;  // make sn a cstring
     uint8_t firmwareRev[8];
-	uint8_t null1;  // make firmware rev a cstring
+    uint8_t null1;  // make firmware rev a cstring
     uint8_t modelNum[40];
-	uint8_t null2;  // make model number a cstring
-} OPAL_DiskInfo;
+    uint8_t null2;  // make model number a cstring
+};
+
 /** Response returned by ATA Identify */
-typedef struct _IDENTIFY_RESPONSE {
+struct IDENTIFY_RESPONSE {
     uint8_t reserved0;
     uint8_t reserved1 : 7;
     uint8_t devType : 1;
@@ -349,7 +384,7 @@ typedef struct _IDENTIFY_RESPONSE {
     uint8_t reserved3[6];
     uint8_t firmwareRev[8];
     uint8_t modelNum[40];
-} IDENTIFY_RESPONSE;
+};
 
 
 
@@ -360,7 +395,7 @@ class CScsiCmdInquiry
 public:
     enum
     {
-        OPCODE  = 0x12,
+        OPCODE = 0x12,
     };
     uint8_t         m_Opcode;                               //  0
     unsigned        m_EVPD                  : 1;            //  1
@@ -420,7 +455,7 @@ class CScsiCmdSecurityProtocolIn
 public:
     enum
     {
-        OPCODE  = 0XA2,
+        OPCODE = 0XA2,
     };
     uint8_t         m_Opcode;                   //  0
     uint8_t         m_SecurityProtocol;         //  1
@@ -440,7 +475,7 @@ class CScsiCmdSecurityProtocolOut
 public:
     enum
     {
-        OPCODE  = 0XB5,
+        OPCODE = 0XB5,
     };
     uint8_t         m_Opcode;                   //  0
     uint8_t         m_SecurityProtocol;         //  1
@@ -454,3 +489,5 @@ public:
 };                      // 12
 
 #pragma pack(pop)
+
+#endif // !DTA_STRUCTURES_H
