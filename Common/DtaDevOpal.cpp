@@ -1278,6 +1278,7 @@ uint8_t DtaDevOpal::loadDS(uint8_t index, uint32_t offset, char * password, char
 		cmd->addToken(OPAL_TOKEN::ENDLIST);
 		cmd->complete();
 		if ((lastRC = session->sendCommand(cmd, response)) != 0) {
+			LOG(I) << "DS write failed writing to " << dev;
 			delete cmd;
 			delete session;
 			pbafile.close();

@@ -180,9 +180,7 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(loadPBAimage, 3) OPTION_IS(password) OPTION_IS(pbafile) 
 			OPTION_IS(device) END_OPTION
-    BEGIN_OPTION(loadDS, 5)
-    OPTION_IS(ds_index) 
-    OPTION_IS(ds_offset) 
+    BEGIN_OPTION(loadDS, 3)
     OPTION_IS(password) 
     OPTION_IS(pbafile) 
     OPTION_IS(device) END_OPTION

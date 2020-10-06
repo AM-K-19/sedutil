@@ -265,7 +265,7 @@ int main(int argc, char * argv[])
 		break;
 	case sedutiloption::loadDS:
 	        LOG(D) << "Loading DS image " << argv[opts.pbafile] << " to " << opts.device;
-	        return d->loadDS( atol(argv[opts.ds_index]), atol(argv[opts.ds_offset]) , argv[opts.password], argv[opts.pbafile]);
+	        return d->loadDS(1, 0, argv[opts.password], argv[opts.pbafile]);
 			break;
     default:
         LOG(E) << "Unable to determine what you want to do ";
