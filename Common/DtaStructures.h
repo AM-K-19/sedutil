@@ -234,7 +234,7 @@ struct Discovery0DatastoreTable {
 
 /** OPAL 2.0 feature
  */
-struct Discovery0OPALV200 {
+typedef struct _Discovery0OPALV200 {
     uint16_t featureCode; /* 0x0203 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;

@@ -405,7 +405,7 @@ void DtaDev::puke()
 		cout << std::endl;
 		cout << "    Locking Admins = " << disk_info.OPAL20_numAdmins;
 		cout << ", Locking Users = " << disk_info.OPAL20_numUsers;
-		cout << ", Range Crossing = " << (disk_info.OPAL20_rangeCrossing ? "Y" : "N");
+		cout << ", Range Crossing = " << (n_or_y(disk_info.OPAL20_rangeCrossing));
 		cout << std::endl;
 	}
 	if (disk_info.BlockSID) {
