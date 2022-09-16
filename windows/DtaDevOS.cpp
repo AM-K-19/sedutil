@@ -150,40 +150,37 @@ void DtaDevOS::identify(OPAL_DiskInfo& di)
 /** Static member to scann for supported drives */
 int DtaDevOS::diskScan()
 {
-    int i{0};
-    LOG(D1) << "Creating diskList";
-    std::cout << "Scanning for Opal compliant disks" << std::endl;
-    while (TRUE) {
-        std::string devname(R"(\\.\PhysicalDrive)" + std::to_string(i));
-        auto d = std::make_unique<DtaDevGeneric>(devname);
-        if (d->isPresent())
-        {
-            std::cout << devname << " ";
-            if (d->isAnySSC())
-            {
-                std::cout << (d->isOpal1() ? "1" : " ")
-                    << (d->isOpal2() ? "2" : " ")
-                    << (d->isEprise() ? "E" : " ");
-            }
-            else
-            {
-                std::cout << "No  ";
-            }
-            std::cout << d->getModelNum() << " " << d->getFirmwareRev() << std::endl;
-            if (MAX_DISKS == i)
-            {
-                LOG(I) << MAX_DISKS << " disks, really?";
-                return 1;
-            }
-        }
-        else
-        {
-            break;
-        }
-        ++i;
-    }
-    std::cout << "No more disks present ending scan" << std::endl;
-    return 0;
+	char devname[25];
+	int i = 0;
+	DtaDev * d;
+	LOG(D1) << "Creating diskList";
+	printf("\nScanning for Opal compliant disks\n");
+	while (TRUE) {
+		sprintf_s(devname, 23, "\\\\.\\PhysicalDrive%i", i);
+		d = new DtaDevGeneric(devname);
+		if (d->isPresent()) {
+			printf("%s", devname);
+			if (d->isAnySSC())
+				printf(" %s%s%s%s%s%s%s ", (d->isOpal1() ? "1" : " "),
+				(d->isOpal2() ? "2" : " "), (d->isEprise() ? "E" : " "),
+				(d->isOpalite() ? "L" : " "), (d->isPyrite1() ? "p" : " "),
+				(d->isPyrite2() ? "P" : " "), (d->isRuby1() ? "r" : " "));
+			else
+				printf("%s", " No      ");
+			cout << d->getModelNum() << " " << d->getFirmwareRev() << std::endl;
+			if (MAX_DISKS == i) {
+				LOG(I) << MAX_DISKS << " disks, really?";
+				delete d;
+				return 1;
+			}
+		}
+		else break;
+		delete d;
+		i += 1;
+	}
+	delete d;
+	printf("No more disks present ending scan\n");
+	return 0;
 }
 
 /** Close the filehandle so this object can be delete. */
