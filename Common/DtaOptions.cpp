@@ -193,8 +193,8 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
     OPTION_IS(pbafile) 
     OPTION_IS(device) END_OPTION
     BEGIN_OPTION(saveDS, 4)
-    OPTION_IS(lrlength)
     OPTION_IS(password) 
+    OPTION_IS(lrlength)
     OPTION_IS(pbafile) 
     OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(revertTPer, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
