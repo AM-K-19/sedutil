@@ -20,6 +20,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef _DTAOPTIONS_H
 #define	_DTAOPTIONS_H
+extern size_t tokenLimitOption;
 
 /** Output modes */
 typedef enum _sedutiloutput {
@@ -43,6 +44,7 @@ typedef struct _DTA_OPTIONS {
 	uint8_t lrlength;		/** the length in blocks of a lockingrange */
 	bool no_hash_passwords; /** global parameter, disables hashing of passwords */
 	sedutiloutput output_format;
+	uint8_t token_limit;
 } DTA_OPTIONS;
 /** Print a usage message */
 void usage();

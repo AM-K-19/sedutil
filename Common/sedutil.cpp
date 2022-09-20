@@ -278,11 +278,11 @@ int main(int argc, char * argv[])
 		return d->rawCmd(argv[argc - 7], argv[argc - 6], argv[argc - 5], argv[argc - 4], argv[argc - 3], argv[argc - 2]);
 		break;
 	case sedutiloption::loadDS:
-		LOG(D) << "Loading DS image " << argv[opts.pbafile] << " to " << opts.device;
+		LOG(D) << "Loading DS image " << argv[opts.pbafile] << " to " << argv[opts.device];
 		return d->loadDS(1, 0, argv[opts.password], argv[opts.pbafile]);
 		break;
 	case sedutiloption::saveDS:
-		LOG(D) << "Saving DS image " << argv[opts.pbafile] << " to " << opts.device;
+		LOG(D) << "Saving DS image " << argv[opts.pbafile] << " to " << argv[opts.device];
 		return d->saveDS(1, 0, atol(argv[opts.lrlength]), argv[opts.password], argv[opts.pbafile]);
 		break;
 	default:

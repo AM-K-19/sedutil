@@ -37,6 +37,8 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+size_t tokenLimitOption;
+
 DtaDevOpal::DtaDevOpal()
 {
 }
@@ -1213,6 +1215,9 @@ uint8_t DtaDevOpal::loadDS(uint8_t index, uint32_t offset, char * password, char
 	if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
 	vector <uint8_t> buffer, lengthtoken;
 	blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
+	if (tokenLimitOption && (blockSize >= tokenLimitOption)) {
+		blockSize = tokenLimitOption;
+	}
 	buffer.resize(blockSize);
 	pbafile.open(filename, ios::in | ios::binary);
 	if (!pbafile) {
@@ -1282,9 +1287,8 @@ uint8_t DtaDevOpal::loadDS(uint8_t index, uint32_t offset, char * password, char
 			return lastRC;
 		}
 		filepos += blockSize;
-		cout << filepos << " of " << eofpos << " " << (uint16_t) (((float)filepos/(float)eofpos) * 100) << "% blk=" << blockSize << " \r";
+		cout << filepos << " of " << eofpos << " " << (uint16_t) (((float)filepos/(float)eofpos) * 100) << "% blk=" << blockSize << " \n";
 	}
-	cout << "\n";
 	delete cmd;
 	delete session;
 	pbafile.close();
@@ -1311,6 +1315,9 @@ uint8_t DtaDevOpal::saveDS(uint8_t index, uint32_t offset, uint32_t length, char
 	if (blockSize > HOST_MAX_COM_PACKET_SIZE) blockSize = HOST_MAX_COM_PACKET_SIZE;
 	vector <uint8_t> buffer, lengthtoken;
 	blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
+	if (tokenLimitOption && (blockSize >= tokenLimitOption)) {
+		blockSize = tokenLimitOption;
+	}	
 	LOG(D1) << "Entering DtaDevOpal::saveDS()" << filename << " " << dev << " block size " << blockSize;
 	buffer.resize(blockSize);
 	pbafile.open(filename, ios::out | ios::binary);
@@ -1379,9 +1386,8 @@ uint8_t DtaDevOpal::saveDS(uint8_t index, uint32_t offset, uint32_t length, char
 		pbafile.write((char *)buffer.data(), blockSize);
 		
 		filepos += blockSize;
-		cout << filepos << " of " << eofpos << " " << (uint16_t) (((float)filepos/(float)eofpos) * 100) << "% blk=" << blockSize << " \r";
+		cout << filepos << " of " << eofpos << " " << (uint16_t) (((float)filepos/(float)eofpos) * 100) << "% blk=" << blockSize << " \n";
 	}
-	cout << "\n";
 	delete cmd;
 	delete session;
 	pbafile.close();

@@ -27,10 +27,11 @@ void usage()
     printf("a utility to manage self encrypting drives that conform\n");
     printf("to the TCG Enterprise, Opal, Opalite and Pyrite SSC specs\n");
     printf("General Usage:                     (see readme for extended commandset)\n");
-    printf("sedutil-cli <-v> <-n> <action> <options> <device>\n");
+    printf("sedutil-cli [-v] [-n] [-l] [-t <limit>] <action> <options> <device>\n");
     printf("-v (optional)                       increase verbosity, one to five v's\n");
     printf("-n (optional)                       no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                       log style output to stderr only\n");
+    printf("-t <limit_size> (optional)          limit maximum token size during datastore transfers\n");
     printf("actions \n");
     printf("--scan \n");
     printf("                                Scans the devices on the system \n");
@@ -141,14 +142,20 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			LOG(D) << "sedutil version : " << GIT_VERSION;
 		}
 		else if (!(strcmp("-n", argv[i]))) {
-                        baseOptions += 1;
+			baseOptions += 1;
 			opts->no_hash_passwords = true;
 			LOG(D) << "Password hashing is disabled";
-                }
+		}
 		else if (!strcmp("-l", argv[i])) {
 			baseOptions += 1;
 			opts->output_format = sedutilNormal;
 			outputFormat = sedutilNormal;
+		}
+		else if (!strcmp("-t", argv[i])) {
+			baseOptions += 2;
+			++i;
+			tokenLimitOption = strtoul(argv[i], NULL, 0);
+			LOG(D) << "Token limit set to: " << tokenLimitOption;
 		}
 		else if (!(('-' == argv[i][0]) && ('-' == argv[i][1])) && 
 			(0 == opts->action))
