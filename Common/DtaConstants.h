@@ -20,11 +20,11 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
  /** MAX Length of input the IO buffers used */
 #define MAX_BUFFER_LENGTH 61440
 /** Length of input the IO buffers used */
-#define MIN_BUFFER_LENGTH 2048
+#define MIN_BUFFER_LENGTH 4096
 /** Host properties that we advertise to the device*/
-#define HOST_MAX_COM_PACKET_SIZE 2048
-#define HOST_MAX_PACKET_SIZE 2028
-#define HOST_MAX_TOKEN_SIZE 1992
+#define HOST_MAX_COM_PACKET_SIZE 4096
+#define HOST_MAX_PACKET_SIZE 4076
+#define HOST_MAX_TOKEN_SIZE 4040
 
 /** Alignment of the IO buffers.
 * generic align on 1k boundary probably not needed
