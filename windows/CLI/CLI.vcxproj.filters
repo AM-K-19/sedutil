@@ -117,13 +117,13 @@
     <ClInclude Include="..\..\Common\pbkdf2\pbkdf2.h">
       <Filter>Header Files\pbkdf2</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\pbkdf2\sha1.h">
-      <Filter>Header Files\pbkdf2</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Common\pbkdf2\tassert.h">
       <Filter>Header Files\pbkdf2</Filter>
     </ClInclude>
     <ClInclude Include="..\DtaDiskNVMe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\pbkdf2\sha2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -206,10 +206,10 @@
     <ClCompile Include="..\..\Common\pbkdf2\pbkdf2.c">
       <Filter>Source Files\pbkdf2</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\pbkdf2\sha1.c">
-      <Filter>Source Files\pbkdf2</Filter>
-    </ClCompile>
     <ClCompile Include="..\DtaDiskNVMe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\pbkdf2\sha512.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
