@@ -1472,7 +1472,7 @@ uint8_t DtaDevOpal::setSIDPassword(char * oldpassword, char * newpassword,
 	else {
 		hash.push_back(0xd0);
 		hash.push_back((uint8_t)strnlen(newpassword, 255));
-		for (uint16_t i = 0; i < strnlen(newpassword, 255); i++) {
+		for (size_t i = 0; i < strnlen(newpassword, 255); i++) {
 			hash.push_back(newpassword[i]);
 		}
 	}

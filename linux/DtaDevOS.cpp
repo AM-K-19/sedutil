@@ -147,7 +147,7 @@ int  DtaDevOS::diskScan()
     }
     std::sort(devices.begin(),devices.end());
     printf("Scanning for Opal compliant disks\n");
-    for(uint16_t i = 0; i < devices.size(); i++) {
+    for(size_t i = 0; i < devices.size(); i++) {
                 snprintf(devname,23,"/dev/%s",devices[i].c_str());
                 printf("%-10s", devname);
                 d = new DtaDevGeneric(devname);
