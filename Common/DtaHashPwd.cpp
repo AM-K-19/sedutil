@@ -46,7 +46,7 @@ void DtaHashPassword(vector<uint8_t> &hash, char * password, vector<uint8_t> sal
 		goto exit;
 	}
 	hash.reserve(hashsize + 2); // hope this will prevent reallocation
-	for (uint16_t i = 0; i < hashsize; i++) {
+	for (size_t i = 0; i < hashsize; i++) {
 		hash.push_back(' ');
 	}
 	
@@ -70,7 +70,7 @@ void DtaHashPwd(vector<uint8_t> &hash, char * password, DtaDev * d)
 
     if (d->no_hash_passwords) {
         hash.clear();
-	for (uint16_t i = 0; i < strnlen(password, 32); i++)
+	for (size_t i = 0; i < strnlen(password, 32); i++)
 		hash.push_back(password[i]);
 	// add the token overhead
 	hash.insert(hash.begin(), (uint8_t)hash.size());

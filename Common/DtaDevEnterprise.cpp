@@ -633,7 +633,7 @@ uint8_t DtaDevEnterprise::listLockingRanges(char * password, int16_t rangeid)
     set8(table, OPALUID[OPAL_LOCKINGRANGE_GLOBAL]);
 
     uint16_t start = (rangeid == -1)? 0: rangeid;
-	for (uint16_t i = start; i <= MaxRanges; i++)
+	for (size_t i = start; i <= MaxRanges; i++)
     {
 		uint8_t curRC = 0;
 
@@ -1187,7 +1187,7 @@ uint8_t DtaDevEnterprise::initLSPUsers(char * defaultPassword, char * newPasswor
 	LOG(I) << "Maximum ranges supported " << MaxRanges;
 // do bandmasters
     set8(user, OPALUID[ENTERPRISE_BANDMASTER0_UID]);
-	for (uint16_t i = 0; i <= MaxRanges; i++) {
+	for (size_t i = 0; i <= MaxRanges; i++) {
         setband(user, i);
 		LOG(D3) << "initializing BandMaster" << (uint16_t) i;
 		session = new DtaSession(this);
@@ -1311,7 +1311,7 @@ uint8_t DtaDevEnterprise::setSIDPassword(char * oldpassword, char * newpassword,
 	} else {
 		hash.push_back(0xd0);
 		hash.push_back((uint8_t)strnlen(newpwd, 255));
-		for (uint16_t i = 0; i < strnlen(newpwd, 255); i++) {
+		for (size_t i = 0; i < strnlen(newpwd, 255); i++) {
 			hash.push_back(newpwd[i]);
 		}
 	}
