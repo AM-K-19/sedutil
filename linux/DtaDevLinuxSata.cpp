@@ -270,7 +270,7 @@ void DtaDevLinuxSata::identify(OPAL_DiskInfo& disk_info)
     }
 
     if (!(memcmp(nullz.data(), buffer, 512))) {
-        disk_info.devType = DEVICE_TYPE_OTHER;
+        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
         // XXX: ioctl call was aborted or returned no data, most probably
         //      due to driver not being libata based, let's try SAS instead.
         identify_SAS(&disk_info);

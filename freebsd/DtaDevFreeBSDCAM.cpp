@@ -175,13 +175,13 @@ void DtaDevFreeBSDCAM::identify(OPAL_DiskInfo& disk_info)
 	ccb.ccb_h.func_code = XPT_GDEV_TYPE;
 	if (cam_send_ccb(camdev, &ccb) < 0) {
 		LOG(D4) << "cam_send_ccb failed";
-		disk_info.devType = DEVICE_TYPE_OTHER;
+		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
 		return;
 	}
 
 	if ((ccb.ccb_h.status & CAM_STATUS_MASK) != CAM_REQ_CMP) {
 		LOG(D4) << "cam_send_ccb error" << ccb.ccb_h.status;
-		disk_info.devType = DEVICE_TYPE_OTHER;
+		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
 		return;
 	}
 
@@ -198,7 +198,7 @@ void DtaDevFreeBSDCAM::identify(OPAL_DiskInfo& disk_info)
 		isNVMe = 1;
 		if (nvme_get_cdata(camdev, &cdata)) {
 			LOG(D4) << "nvme_get_cdata failed";
-			disk_info.devType = DEVICE_TYPE_OTHER;
+			disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
 			return;
 		}
 		safecopy(disk_info.serialNum, sizeof(disk_info.serialNum),
@@ -217,7 +217,7 @@ void DtaDevFreeBSDCAM::identify(OPAL_DiskInfo& disk_info)
 			disk_info.devType = DEVICE_TYPE_NVME;
 		} else {
 			LOG(D4) << "Security Send/Receive are not supported";
-			disk_info.devType = DEVICE_TYPE_OTHER;
+			disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
 		}
 	} else if (ccb.cgd.protocol == PROTO_ATA) {
 		safecopy(disk_info.serialNum, sizeof(disk_info.serialNum),
@@ -238,10 +238,10 @@ void DtaDevFreeBSDCAM::identify(OPAL_DiskInfo& disk_info)
 		} else {
 			LOG(D4) << "Trusted Computing feature set is not supported "
 			    << std::hex << ccb.cgd.ident_data.tcg;
-			disk_info.devType = DEVICE_TYPE_OTHER;
+			disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
 		}
 	} else {
-		disk_info.devType = DEVICE_TYPE_OTHER;
+		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
 	}
 }
 
