@@ -39,6 +39,8 @@ typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER {
 class DtaDiskNVMe : public DtaDiskType
 {
 public:
+	DtaDiskNVMe();
+	~DtaDiskNVMe();
 	/** device specific initialization.
 	* This function should perform the necessary authority and environment checking
 	* to allow proper functioning of the program, open the device, perform an

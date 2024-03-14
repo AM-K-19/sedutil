@@ -147,7 +147,7 @@ void DtaDiskNVMe::identify(OPAL_DiskInfo& disk_info)
         return;
     }
 	if (!(memcmp(identifyResp, nullz.data(), 512))) {
-		disk_info.devType = DEVICE_TYPE_OTHER;
+		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
 		return;
 	}
 	SCSI_INQUIRY_RESPONSE * id = (SCSI_INQUIRY_RESPONSE *)identifyResp;
