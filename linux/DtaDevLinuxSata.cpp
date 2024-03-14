@@ -67,7 +67,7 @@ bool DtaDevLinuxSata::init(const char * devref)
     LOG(D1) << "Creating DtaDevLinuxSata::DtaDev() " << devref;
 	bool isOpen = FALSE;
 
-    if(access("/dev/sda", R_OK | W_OK)) {
+    if (access(devref, R_OK | W_OK)) {
         LOG(E) << "You do not have permission to access the raw disk in write mode";
         LOG(E) << "Perhaps you might try sudo to run as root";
     }
@@ -270,7 +270,9 @@ void DtaDevLinuxSata::identify(OPAL_DiskInfo& disk_info)
     }
 
     if (!(memcmp(nullz.data(), buffer, 512))) {
-        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+        disk_info.devType = DEVICE_TYPE_OTHER;
+        // XXX: ioctl call was aborted or returned no data, most probably
+        //      due to driver not being libata based, let's try SAS instead.
         identify_SAS(&disk_info);
         return;
     }
