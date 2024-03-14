@@ -137,7 +137,7 @@ uint8_t DtaDiskUSB::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16_t comID,
 void DtaDiskUSB::identify(OPAL_DiskInfo& disk_info)
 {
     identify_SAS(disk_info);
-    if (DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER!=disk_info.devType) {
+    if (DEVICE_TYPE_OTHER!=disk_info.devType) {
         return;
     }
 
@@ -154,13 +154,13 @@ void DtaDiskUSB::identify(OPAL_DiskInfo& disk_info)
     if (0x00 != iorc) {
         LOG(D) << "IDENTIFY Failed " << (uint16_t) iorc;
     }
-    if (!(memcmp(identifyResp, nullz.data(), 512))) {
-        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
-        _aligned_free(identifyResp);
-        return;
-    }
-    USB_INQUIRY_DATA * id = (USB_INQUIRY_DATA *) identifyResp;
-    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_USB;
+	if (!(memcmp(identifyResp, nullz.data(), 512))) {
+		disk_info.devType = DEVICE_TYPE_OTHER;
+		_aligned_free(identifyResp);
+		return;
+	}
+	UASP_INQUIRY_RESPONSE * id = (UASP_INQUIRY_RESPONSE *) identifyResp;
+    disk_info.devType = DEVICE_TYPE_USB;
     for (int i = 0; i < sizeof (disk_info.serialNum); i += 2) {
         disk_info.serialNum[i] = id->ProductSerial[i + 1];
         disk_info.serialNum[i + 1] = id->ProductSerial[i];
@@ -307,12 +307,12 @@ void DtaDiskUSB::identify_SAS(OPAL_DiskInfo& disk_info)
         LOG(D) << "IDENTIFY Failed " << (uint16_t) iorc;
     }
     if (!(memcmp(identifyResp, nullz.data(), 512))) {
-        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+        disk_info.devType = DEVICE_TYPE_OTHER;
         _aligned_free(identifyResp);
         return;
     }
 
-    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_USB;
+    disk_info.devType = DEVICE_TYPE_USB;
     isSAS = 1;
 
     // response is a standard INQUIRY (at least 36 bytes)

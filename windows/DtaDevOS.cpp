@@ -103,7 +103,7 @@ void DtaDevOS::init(const char * devref)
 
     disk->init(dev);
     identify(disk_info);
-    if (DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER != disk_info.devType)
+    if (DEVICE_TYPE_OTHER != disk_info.devType)
     {
         discovery0();
     }

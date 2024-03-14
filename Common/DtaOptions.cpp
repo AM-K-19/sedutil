@@ -119,7 +119,7 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
         usage();
 		return DTAERROR_INVALID_COMMAND;
     }
-	for (int i = 1; i < argc; i++) {
+	for (uint8_t i = 1; i < (uint8_t)argc; i++) {
 		if (!(strcmp("-h", argv[i])) || !(strcmp("--help", argv[i]))) {
 			usage();
 			return DTAERROR_INVALID_COMMAND;

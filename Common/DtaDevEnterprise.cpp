@@ -633,7 +633,7 @@ uint8_t DtaDevEnterprise::listLockingRanges(char * password, int16_t rangeid)
     set8(table, OPALUID[OPAL_LOCKINGRANGE_GLOBAL]);
 
     uint16_t start = (rangeid == -1)? 0: rangeid;
-	for (size_t i = start; i <= MaxRanges; i++)
+	for (uint16_t i = start; i <= (uint16_t) MaxRanges; i++)
     {
 		uint8_t curRC = 0;
 
@@ -1187,7 +1187,7 @@ uint8_t DtaDevEnterprise::initLSPUsers(char * defaultPassword, char * newPasswor
 	LOG(I) << "Maximum ranges supported " << MaxRanges;
 // do bandmasters
     set8(user, OPALUID[ENTERPRISE_BANDMASTER0_UID]);
-	for (size_t i = 0; i <= MaxRanges; i++) {
+	for (uint16_t i = 0; i <= (uint16_t)MaxRanges; i++) {
         setband(user, i);
 		LOG(D3) << "initializing BandMaster" << (uint16_t) i;
 		session = new DtaSession(this);
@@ -1428,7 +1428,7 @@ uint8_t DtaDevEnterprise::exec(DtaCommand * cmd, DtaResponse & resp, uint8_t pro
     IFLOG(D) DtaAnnotatedDump(IF_RECV, cmd->getRespBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
     IFLOG(D3) DtaHexDump(cmd->getRespBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
     if (0 != rc) {
-        LOG(E) << "Command failed on recv" << (uint16_t) rc;
+        LOG(E) << "Command failed on recv, returned " << (uint16_t) rc;
         return rc;
     }
     resp.init(cmd->getRespBuffer());
