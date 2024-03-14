@@ -129,11 +129,11 @@ void DtaDiskATA::identify(OPAL_DiskInfo& disk_info)
         //return;
     }
 	if (!(memcmp(identifyResp, nullz.data(), 512))) {
-		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+		disk_info.devType = DEVICE_TYPE_OTHER;
 		return;
 	}
     IDENTIFY_RESPONSE* id = (IDENTIFY_RESPONSE*) identifyResp;
-    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_ATA;
+    disk_info.devType = DEVICE_TYPE_ATA;
     for (int i = 0; i < sizeof (disk_info.serialNum); i += 2) {
         disk_info.serialNum[i] = id->serialNum[i + 1];
         disk_info.serialNum[i + 1] = id->serialNum[i];

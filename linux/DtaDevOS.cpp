@@ -79,7 +79,7 @@ void DtaDevOS::init(const char * devref)
     {
         isOpen = TRUE;
         drive->identify(disk_info);
-        if (disk_info.devType != DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER)
+        if (disk_info.devType != DEVICE_TYPE_OTHER)
             discovery0();
     }
     else

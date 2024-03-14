@@ -114,13 +114,13 @@ void DtaDevFreeBSDNvme::identify(OPAL_DiskInfo& disk_info)
 
 	if (ioctl(fd, NVME_PASSTHROUGH_CMD, &pt) < 0) {
 		LOG(E) << "Identify error " << errno;
-		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+		disk_info.devType = DEVICE_TYPE_OTHER;
 		return;
 	}
 
 	if (nvme_completion_is_error(&pt.cpl)) {
 		LOG(E) << "identify request returned error";
-		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+		disk_info.devType = DEVICE_TYPE_OTHER;
 		return;
 	}
 
@@ -138,7 +138,7 @@ void DtaDevFreeBSDNvme::identify(OPAL_DiskInfo& disk_info)
 		disk_info.devType = DEVICE_TYPE_NVME;
 	} else {
 		LOG(D4) << "Security Send/Receive are not supported";
-		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+		disk_info.devType = DEVICE_TYPE_OTHER;
 	}
 }
 

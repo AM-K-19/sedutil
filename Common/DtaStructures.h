@@ -412,16 +412,16 @@ union Discovery0Features {
 
 /** ComPacket (header) for transmissions. */
 
-struct OPALComPacket {
+typedef struct _OPALComPacket {
     uint32_t reserved0;
     uint8_t extendedComID[4];
     uint32_t outstandingData;
     uint32_t minTransfer;
     uint32_t length;
-};
+} OPALComPacket;
 
 /** Packet structure. */
-struct OPALPacket {
+typedef struct _OPALPacket {
     uint32_t TSN;
     uint32_t HSN;
     uint32_t seqNumber;
@@ -429,55 +429,55 @@ struct OPALPacket {
     uint16_t ackType;
     uint32_t acknowledgement;
     uint32_t length;
-};
+} OPALPacket;
 
 /** Data sub packet header */
-struct OPALDataSubPacket {
+typedef struct _OPALDataSubPacket {
     uint8_t reserved0[6];
     uint16_t kind;
     uint32_t length;
-};
+} OPALDataSubPacket;
 
 /** header of a response */
-struct OPALHeader {
+typedef struct _OPALHeader {
     OPALComPacket cp;
     OPALPacket pkt;
     OPALDataSubPacket subpkt;
-};
+} OPALHeader;
 
 /** ATA commands needed for TCG storage communication */
-enum ATACOMMAND {
+typedef enum _ATACOMMAND {
     IF_RECV = 0x5c,
     IF_SEND = 0x5e,
     IDENTIFY = 0xec,
-};
+} ATACOMMAND;
 
-enum class DTA_DEVICE_TYPE {
+typedef enum _DTA_DEVICE_TYPE {
     DEVICE_TYPE_ATA,
     DEVICE_TYPE_SAS,
     DEVICE_TYPE_NVME,
     DEVICE_TYPE_USB,
     DEVICE_TYPE_OTHER,
-};
+} DTA_DEVICE_TYPE;
 
 /** Write human-readable device type to a stream **/
 inline std::ostream& operator<<(std::ostream& os, const DTA_DEVICE_TYPE& type)
 {
     switch (type)
     {
-    case DTA_DEVICE_TYPE::DEVICE_TYPE_ATA:
+    case DEVICE_TYPE_ATA:
         os << "ATA";
         break;
-    case DTA_DEVICE_TYPE::DEVICE_TYPE_SAS:
+    case DEVICE_TYPE_SAS:
         os << "SAS";
         break;
-    case DTA_DEVICE_TYPE::DEVICE_TYPE_USB:
+    case DEVICE_TYPE_USB:
         os << "USB";
         break;
-    case DTA_DEVICE_TYPE::DEVICE_TYPE_NVME:
+    case DEVICE_TYPE_NVME:
         os << "NVMe";
         break;
-    case DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER:
+    case DEVICE_TYPE_OTHER:
     default:
         os << "OTHER";
         break;
@@ -486,7 +486,7 @@ inline std::ostream& operator<<(std::ostream& os, const DTA_DEVICE_TYPE& type)
 }
 
 /** structure to store Disk information. */
-struct OPAL_DiskInfo {
+typedef struct _OPAL_DiskInfo {
     // parsed the Function block?
     uint8_t Unknown;
     uint8_t VendorSpecific;
@@ -591,10 +591,10 @@ struct OPAL_DiskInfo {
     uint8_t null1;  // make firmware rev a cstring
     uint8_t modelNum[40];
     uint8_t null2;  // make model number a cstring
-};
+} OPAL_DiskInfo;
 
 /** Response returned by ATA Identify */
-struct IDENTIFY_RESPONSE {
+typedef struct _IDENTIFY_RESPONSE {
     uint8_t reserved0;
     uint8_t reserved1 : 7;
     uint8_t devType : 1;
@@ -603,7 +603,7 @@ struct IDENTIFY_RESPONSE {
     uint8_t reserved3[6];
     uint8_t firmwareRev[8];
     uint8_t modelNum[40];
-};
+} IDENTIFY_RESPONSE;
 
 typedef struct _UASP_INQUIRY_RESPONSE {
 	uint8_t fill1[20];

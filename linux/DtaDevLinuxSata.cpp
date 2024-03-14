@@ -245,7 +245,7 @@ void DtaDevLinuxSata::identify(OPAL_DiskInfo& disk_info)
         IFLOG(D4) DtaHexDump(cdb, sizeof (cdb));
         LOG(D4) << "sense after ";
         IFLOG(D4) DtaHexDump(sense, sizeof (sense));
-        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+        disk_info.devType = DEVICE_TYPE_OTHER;
         identify_SAS(&disk_info);
         return;
     }
@@ -270,7 +270,7 @@ void DtaDevLinuxSata::identify(OPAL_DiskInfo& disk_info)
     }
 
     if (!(memcmp(nullz.data(), buffer, 512))) {
-        disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+        disk_info.devType = DEVICE_TYPE_OTHER;
         // XXX: ioctl call was aborted or returned no data, most probably
         //      due to driver not being libata based, let's try SAS instead.
         identify_SAS(&disk_info);
@@ -278,7 +278,7 @@ void DtaDevLinuxSata::identify(OPAL_DiskInfo& disk_info)
     }
     IDENTIFY_RESPONSE * id = (IDENTIFY_RESPONSE *) buffer;
 //    disk_info->devType = id->devType;
-    disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_ATA;
+    disk_info.devType = DEVICE_TYPE_ATA;
 //   memcpy(disk_info.serialNum, id->serialNum, sizeof (disk_info.serialNum));
 //   memcpy(disk_info.firmwareRev, id->firmwareRev, sizeof (disk_info.firmwareRev));
 //   memcpy(disk_info.modelNum, id->modelNum, sizeof (disk_info.modelNum));
@@ -426,7 +426,7 @@ void DtaDevLinuxSata::identify_SAS(OPAL_DiskInfo *disk_info)
         IFLOG(D4) DtaHexDump(cdb, sizeof (cdb));
         LOG(D4) << "sense after ";
         IFLOG(D4) DtaHexDump(sense, sizeof (sense));
-        disk_info->devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+        disk_info->devType = DEVICE_TYPE_OTHER;
         free(buffer);
         return;
     }
@@ -438,7 +438,7 @@ void DtaDevLinuxSata::identify_SAS(OPAL_DiskInfo *disk_info)
         IFLOG(D4) DtaHexDump(cdb, sizeof (cdb));
         LOG(D4) << "sense after ";
         IFLOG(D4) DtaHexDump(sense, sizeof (sense));
-        disk_info->devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+        disk_info->devType = DEVICE_TYPE_OTHER;
         free(buffer);
         return;
     }
@@ -454,7 +454,7 @@ void DtaDevLinuxSata::identify_SAS(OPAL_DiskInfo *disk_info)
         IFLOG(D4) DtaHexDump(cdb, sizeof (cdb));
         LOG(D4) << "sense after ";
         IFLOG(D4) DtaHexDump(sense, sizeof (sense));
-        disk_info->devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+        disk_info->devType = DEVICE_TYPE_OTHER;
         free(buffer);
         return;
     }
@@ -465,7 +465,7 @@ void DtaDevLinuxSata::identify_SAS(OPAL_DiskInfo *disk_info)
     safecopy(disk_info->modelNum, sizeof(disk_info->modelNum), resp->m_ProductId, sizeof(resp->m_ProductId));
 
     // device is apparently a SCSI disk
-    disk_info->devType = DTA_DEVICE_TYPE::DEVICE_TYPE_SAS;
+    disk_info->devType = DEVICE_TYPE_SAS;
     isSAS = 1;
 
     // free buffer and return

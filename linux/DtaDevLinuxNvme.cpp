@@ -125,13 +125,13 @@ void DtaDevLinuxNvme::identify(OPAL_DiskInfo& disk_info)
 
 	if (err) {
 		LOG(E) << "Identify error. NVMe status " << err;
-		disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_OTHER;
+		disk_info.devType = DEVICE_TYPE_OTHER;
 		IFLOG(D4) DtaHexDump(&cmd, sizeof(cmd));
 		IFLOG(D4) DtaHexDump(&ctrl, sizeof(ctrl));
 		return;
 	}
 
-	disk_info.devType = DTA_DEVICE_TYPE::DEVICE_TYPE_NVME;
+	disk_info.devType = DEVICE_TYPE_NVME;
 	uint8_t *results = ctrl;
 	results += 4;
 	memcpy(disk_info.serialNum, results, sizeof(disk_info.serialNum));
