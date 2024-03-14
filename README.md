@@ -1,10 +1,23 @@
 ![alt tag](https://avatars0.githubusercontent.com/u/13870012?v=3&s=200)
 
-Intel and AMD Ryzen: This SEDutil fork includes support for intel and AMD Ryzen systems with SHA-512 password authentication
+Intel and AMD Ryzen: This is an aggregate SEDutil fork, based on the original DTA project with additional support for:
+* SHA-512 password authentication
+* Opal Lite
+* Opal Pyrite
+* Opal Ruby
+* Minor tweaks and fixes
 
 Note: This version of SEDutil is not compatible with SHA-1 versions of SEDutil
 
 This software is Copyright 2014-2017 Bright Plaza Inc. <drivetrust@drivetrust.com>
+
+Greatful thanks and acknowledgements to the following projects and their maintainers, whose work is included in this fork:
+
+https://github.com/Drive-Trust-Alliance/sedutil (original project)
+https://github.com/ChubbyAnt/sedutil (a ton of useful stuff like Opal Lite, Ruby, Pyrite)
+https://github.com/ladar/sedutil (SHA512)
+https://github.com/ckamm/sedutil/
+
 
 This file is part of sedutil.
 
@@ -66,8 +79,9 @@ This version of sedutil is based off the original [@dta](https://github.com/Driv
 
 Unique to this repo are the following modifications:
 
-* SHA512 password hashing vs SHA1 on original SEDutil
-* Compatibile with AMD Ryzen and AMD Ryzen mobile systems
+* Minor fix for range crossing field reporting in Level0 descriptor
+* Tweak default session timeout to 120 seconds
+* Private branches supporting datastore access
 
 
 ## Build Process
@@ -88,13 +102,13 @@ sudo apt-get install build-essential autoconf pkg-config libc6-dev make g++-mult
 ### Automatically Build Everything:  
 
 ```
-git clone https://github.com/ChubbyAnt/sedutil && cd sedutil && autoreconf --install && ./configure && make all && cd images && ./getresources && ./buildpbaroot && ./buildbios && ./buildUEFI64 && ./buildrescue Rescue32 && ./buildrescue Rescue64 && cd ..
+git clone https://github.com/AM-K-19/sedutil.git && cd sedutil && autoreconf --install && ./configure && make all && cd images && ./getresources && ./buildpbaroot && ./buildbios && ./buildUEFI64 && ./buildrescue Rescue32 && ./buildrescue Rescue64 && cd ..
 ```
 
 ### Build Everything Manually Step by Step:  
 
 ```
-git clone https://github.com/ChubbyAnt/sedutil
+git clone https://github.com/AM-K-19/sedutil.git
 cd sedutil
 autoreconf --install
 ./configure
@@ -246,7 +260,7 @@ Verify that the PBA unlocks your drive, it should say "is OPAL Unlocked" If it d
 
 The SID and Admin1 passwords do not have to match but it makes things easier.  
 ```
-edutil-cli --setsidpassword debug yourrealpassword /dev/nvme0
+sedutil-cli --setsidpassword debug yourrealpassword /dev/nvme0
 sedutil-cli --setadmin1pwd debug yourrealpassword /dev/nvme0
 ```
 
