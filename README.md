@@ -37,7 +37,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 sedutil - The Drive Trust Alliance Self Encrypting Drive Utility
 
-This program and it's accompanying Pre-Boot Authorization image allow
+This program and its accompanying Pre-Boot Authorization image allow
 you to enable the locking in SED's that comply with the TCG OPAL 2.00
 standard, Opalite, Pyrite, and Ruby.   
 
@@ -368,6 +368,3 @@ Expected output:
 ```
 
 When this is finished the drive will be in a non-opal managed state. This would allow you to do anything that you could have done before starting OPAL management under OPAL. You can also reinitiate OPAL management if you wish.
-  
-  
-  
